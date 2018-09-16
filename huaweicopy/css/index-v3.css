@@ -1,0 +1,4531 @@
+@charset "utf-8";
+/* region dc-SlideShow */
+
+.dc-SlideShow {
+  visibility: hidden;
+  position: relative;
+  transition: opacity .3s;
+  opacity: 0;
+}
+
+.dc-SlideShow.loading,
+.dc-SlideShow.loaded {
+  visibility: visible;
+  opacity: 1;
+}
+
+.dc-SlideShow .slides-list,
+.dc-SlideShow .slide-item {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dc-SlideShow .slides-list {
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  /*display: none;*/
+}
+
+.dc-SlideShow .slide-item {
+  visibility: hidden;
+  position: absolute;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.dc-SlideShow .slide-item.active,
+.dc-SlideShow .slide-item.draging {
+  visibility: visible;
+}
+
+.slide-item .slide-bg {
+  display: none;
+}
+
+.slide-item.has-transition {
+  transition: all .3s ease-out;
+}
+
+.dc-SlideShow .slide-item.hidden {
+  visibility: hidden;
+}
+
+.dc-SlideShow .slide-item .slide-link {
+  display: none;
+}
+
+.dc-SlideShow .slide-item.active .slide-link {
+  display: block;
+}
+
+.dc-SlideShow .slide-item.hidden .slide-link {
+  visibility: visible;
+}
+
+/*controls*/
+
+.dc-SlideShow .slide-bullets,
+.dc-SlideShow .slide-hotarea {
+  z-index: 10;
+}
+
+.dc-SlideShow .slide-hotarea {
+  position: absolute;
+  top: 50%;
+  width: 40px;
+  height: 70px;
+  margin-top: -35px;
+  cursor: default;
+  transition: transform .4s ease-out, opacity .4s;
+  opacity: 0;
+}
+
+.dc-SlideShow .slide-hotarea.prev {
+  left: 30px;
+  transform: translate3d(-200px, 0, 0);
+}
+
+.dc-SlideShow .slide-hotarea.next {
+  right: 30px;
+  transform: translate3d(200px, 0, 0);
+}
+
+.dc-SlideShow.loaded:hover .slide-hotarea.prev,
+.dc-SlideShow.loaded:hover .slide-hotarea.next {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+
+.dc-SlideShow:hover .slide-hotarea {
+  display: block;
+  cursor: pointer;
+}
+
+.dc-SlideShow .slide-hotarea > .slide-btn {
+  display: block;
+  position: absolute;
+  top: 50%;
+  width: 100%;
+}
+
+.slide-hotarea.prev .slide-btn {
+  left: 0;
+}
+
+.slide-hotarea.next .slide-btn {
+  right: 0;
+}
+
+.slide-hotarea > .slide-btn:before,
+.slide-hotarea > .slide-btn:after {
+  position: absolute;
+  top: -1px;
+  width: 100%;
+  height: 2px;
+  content: '';
+  transform: rotate(-45deg);
+  background-color: #fff;
+}
+
+.slide-hotarea > .slide-btn:after {
+  transform: rotate(45deg);
+}
+
+.prev .slide-btn:before,
+.prev .slide-btn:after {
+  transform-origin: 0 0;
+}
+
+.next .slide-btn:before,
+.next .slide-btn:after {
+  transform-origin: 100% 0;
+}
+
+.dc-SlideShow .slide-hotarea:hover > .slide-btn {
+  color: #fff;
+  border-radius: 3px;
+  background: rgba(102, 102, 102, .4);
+}
+
+.dc-SlideShow .slide-bullets {
+  position: absolute;
+  bottom: 106px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  font-size: 0;
+}
+
+.dc-SlideShow .slide-bullet {
+  display: inline-block;
+  width: 32px;
+  height: 20px;
+  font-size: 0;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: width .8s;
+}
+
+.dc-SlideShow .slide-bullet:before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(102, 102, 102, .5);
+  vertical-align: middle;
+  transition: width .8s, background-color .8s;
+  box-shadow: 0 3px 6px 0 rgba(33, 39, 81, 0.20);
+}
+
+.dc-SlideShow .slide-bullet.active:before {
+  transform: scale(1.2);
+  background: #fa6f66;
+  box-shadow: 0 3px 6px 0 rgba(250, 111, 102, .5);
+}
+
+@media (max-width: 1023px) {
+  .dc-SlideShow .slide-bullets {
+    bottom: 64px;
+  }
+
+  .dc-SlideShow .slide-bullet {
+    width: 28px;
+  }
+
+  .dc-SlideShow .slide-bullet:before {
+    width: 20px;
+  }
+
+  .dc-SlideShow .slide-bullet.active:before {
+    transform: scale(1.2);
+  }
+}
+
+.effect-layer {
+  display: none;
+  overflow: hidden;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.effect-layer.show-effect {
+  display: block;
+}
+
+/*淡入淡出动画*/
+
+.fade > .effect-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.fade > .curr-slide {
+  z-index: 2;
+}
+
+.fade > .next-slide {
+  z-index: 1;
+}
+
+.show-effect.fade > .curr-slide {
+  animation: effect-fadeOut 1s forwards
+}
+
+.show-effect.fade > .next-slide {
+  animation: effect-fadeIn 1s forwards
+}
+
+@keyframes effect-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes effect-fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0
+  }
+}
+
+/*滑动动效*/
+
+.effect-layer .effect-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.show-effect.slide .curr-slide {
+  animation: effect-slideOutLeft 1s forwards
+}
+
+.show-effect.slide .next-slide {
+  animation: effect-slideInRight 1s forwards
+}
+
+.show-effect.slide.reverse .curr-slide {
+  animation: effect-slideOutRight 1s forwards
+}
+
+.show-effect.slide.reverse .next-slide {
+  animation: effect-slideInLeft 1s forwards
+}
+
+.show-effect.slide-vertical .curr-slide {
+  animation: effect-slideOutUp 1s forwards
+}
+
+.show-effect.slide-vertical .next-slide {
+  animation: effect-slideInDown 1s forwards
+}
+
+.show-effect.slide-vertical.reverse .curr-slide {
+  animation: effect-slideOutDown 1s forwards
+}
+
+.show-effect.slide-vertical.reverse .next-slide {
+  animation: effect-slideInUp 1s forwards
+}
+
+@keyframes effect-slideInLeft {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes effect-slideInRight {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes effect-slideOutLeft {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes effect-slideOutRight {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+@keyframes effect-slideInUp {
+  from {
+    transform: translate3d(0, -100%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes effect-slideInDown {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes effect-slideOutUp {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -100%, 0);
+  }
+}
+
+@keyframes effect-slideOutDown {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+/*turn*/
+
+.stage-3d-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  perspective: 2000px;
+}
+
+.turn-left .curr-slide:before,
+.turn-right .curr-slide:before,
+.turn-up .curr-slide:before,
+.turn-down .curr-slide:before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  content: '';
+  background: rgba(0, 0, 0, .4);
+}
+
+.show-effect.turn-left .curr-slide:before,
+.show-effect.turn-right .curr-slide:before,
+.show-effect.turn-up .curr-slide:before,
+.show-effect.turn-down .curr-slide:before {
+  animation: effect-fadeIn 1s forwards;
+}
+
+.show-effect.turn-right .next-slide {
+  transform-origin: 100% 0;
+  animation: effect-turnInRight 1s forwards;
+}
+
+.show-effect.turn-left .next-slide {
+  transform-origin: 0 0;
+  animation: effect-turnInLeft 1s forwards;
+}
+
+.show-effect.turn-down .next-slide {
+  transform-origin: 0 100%;
+  animation: effect-turnInDown 1s forwards;
+}
+
+.show-effect.turn-up .next-slide {
+  transform-origin: 100% 0;
+  animation: effect-turnInUp 1s forwards;
+}
+
+@keyframes effect-turnInLeft {
+  from {
+    transform: rotateY(90deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
+}
+
+@keyframes effect-turnInRight {
+  from {
+    transform: rotateY(-90deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
+}
+
+@keyframes effect-turnInDown {
+  from {
+    transform: rotateX(90deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
+}
+
+@keyframes effect-turnInUp {
+  from {
+    transform: rotateX(-90deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
+}
+
+.show-effect.shift-left .curr-slide,
+.show-effect.shift-right .curr-slide,
+.show-effect.shift-up .curr-slide,
+.show-effect.shift-down .curr-slide {
+  animation: effect-zoomOut 1s forwards;
+}
+
+.show-effect.shift-right .next-slide {
+  transform-origin: 100% 0;
+  animation: effect-shiftInRight 1s forwards;
+}
+
+.show-effect.shift-left .next-slide {
+  transform-origin: 0 0;
+  animation: effect-shiftInLeft 1s forwards;
+}
+
+.show-effect.shift-up .next-slide {
+  transform-origin: 0 100%;
+  animation: effect-shiftInUp 1s forwards;
+}
+
+.show-effect.shift-down .next-slide {
+  transform-origin: 100% 0;
+  animation: effect-shiftInDown 1s forwards;
+}
+
+@keyframes effect-zoomOut {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(.6);
+  }
+}
+
+@keyframes effect-shiftInLeft {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes effect-shiftInRight {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0)
+  }
+}
+
+@keyframes effect-shiftInUp {
+  from {
+    transform: translate3d(0, -100%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0)
+  }
+}
+
+@keyframes effect-shiftInDown {
+  from {
+    transform: translate3d(0, 100%, 0)
+  }
+  to {
+    transform: translate3d(0, 0, 0)
+  }
+}
+
+.unfold.effect-layer {
+  overflow: visible;
+}
+
+.effect-layer.unfold .effect-slide {
+  width: 50%;
+}
+
+.effect-layer.unfold .next-slide {
+  left: 50%;
+  background-position: 100% 0;
+}
+
+.effect-layer.unfold .unfold-effect-slides {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.unfold-effect-slides .unfold-front,
+.unfold-effect-slides .unfold-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  backface-visibility: hidden;
+}
+
+.unfold .unfold-front {
+  background-position: 100% 0;
+}
+
+.unfold .unfold-back {
+  transform: rotate3d(0, 1, 0, 180deg);
+}
+
+.show-effect.unfold .unfold-effect-slides {
+  transform-origin: 0 0;
+  animation: effect-unfoldLeft 1s forwards;
+}
+
+.unfold.reverse .next-slide {
+  left: 0;
+  background-position: 0 0;
+}
+
+.unfold.reverse .curr-slide {
+  left: 50%;
+  background-position: 100% 0;
+}
+
+.unfold.reverse .unfold-effect-slides {
+  left: 0
+}
+
+.reverse.unfold .unfold-back {
+  background-position: 100% 0;
+}
+
+.reverse.unfold .unfold-front {
+  background-position: 0 0;
+}
+
+.show-effect.unfold.reverse .unfold-effect-slides {
+  transform-origin: 100% 0;
+  animation: effect-unfoldRight 1s forwards;
+}
+
+.unfold-vertical.effect-layer {
+  overflow: visible;
+}
+
+.effect-layer.unfold-vertical .unfold-effect-slides {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100%;
+  height: 50%;
+  transform-style: preserve-3d;
+}
+
+.effect-layer.unfold-vertical .effect-slide {
+  height: 50%;
+}
+
+.effect-layer.unfold-vertical .curr-slide {
+  top: 50%;
+  background-position: 0 100%;
+}
+
+.effect-layer.unfold-vertical .unfold-effect-slides {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  transform-style: preserve-3d;
+}
+
+.unfold-vertical .unfold-back {
+  transform: rotate3d(1, 0, 0, 180deg);
+  background-position: 0 100%;
+}
+
+.show-effect.unfold-vertical .unfold-effect-slides {
+  transform-origin: 0 100%;
+  animation: effect-unfoldDown 1s forwards;
+}
+
+.unfold-vertical.reverse .next-slide {
+  top: 50%;
+  background-position: 0 100%;
+}
+
+.unfold-vertical.reverse .curr-slide {
+  top: 0;
+  background-position: 0 0;
+}
+
+.unfold-vertical.reverse .unfold-effect-slides {
+  top: 50%;
+}
+
+.reverse.unfold-vertical .unfold-back {
+  background-position: 0 0;
+}
+
+.reverse.unfold-vertical .unfold-front {
+  background-position: 0 100%;
+}
+
+.show-effect.unfold-vertical.reverse .unfold-effect-slides {
+  transform-origin: 100% 0;
+  animation: effect-unfoldUp 1s forwards;
+}
+
+@keyframes effect-unfoldLeft {
+  from {
+    transform: rotate3d(0, 1, 0, 0);
+  }
+  to {
+    transform: rotate3d(0, 1, 0, -180deg);
+  }
+}
+
+@keyframes effect-unfoldRight {
+  from {
+    transform: rotate3d(0, 1, 0, 0);
+  }
+  to {
+    transform: rotate3d(0, 1, 0, 180deg);
+  }
+}
+
+@keyframes effect-unfoldDown {
+  from {
+    transform: rotate3d(1, 0, 0, 0);
+  }
+  to {
+    transform: rotate3d(1, 0, 0, -180deg);
+  }
+}
+
+@keyframes effect-unfoldUp {
+  from {
+    transform: rotate3d(1, 0, 0, 0);
+  }
+  to {
+    transform: rotate3d(1, 0, 0, 180deg);
+  }
+}
+
+/* endregion dc-SlideShow */
+
+/* region dc-SlideShow 定制 */
+
+.overview .dc-SlideShow {
+  position: relative;
+  height: 500px;
+}
+
+.slide-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  color: #3550d6;
+}
+
+.slide-content.slide-play {
+  visibility: visible;
+}
+
+.dc-SlideShow.mobile-deviceSize .slide-content {
+  visibility: hidden;
+}
+
+.dc-SlideShow.mobile-device .slide-content [slider-transition-enter-effect],
+.dc-SlideShow.mobile-device .slide-content [slider-transition-exit-effect] {
+  -webkit-transition-duration: 0s !important;
+  transition-duration: 0s !important;
+  opacity: 1;
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+}
+
+.dc-SlideShow .slide-hotarea,
+.dc-SlideShow:hover .slide-hotarea {
+  display: none;
+}
+
+.slide-link {
+  display: block;
+  height: 100%;
+}
+
+@media (max-width: 1023px) {
+  .overview .dc-SlideShow {
+    height: auto;
+    /* min-height: 170px; */
+  }
+}
+
+/* endregion dc-SlideShow 定制 */
+
+/* region overview */
+
+.content-block.overview {
+  position: relative;
+  max-width: none;
+  margin: 0 0 38px 0;
+  padding: 0;
+  background: #fff;
+}
+
+@media (max-width: 1023px) {
+  .content-block.overview {
+    background: #dee6ee;
+  }
+}
+
+/*endregion overview */
+
+/* region banner */
+
+.banner-cover {
+  position: absolute;
+  z-index: 9;
+  bottom: 0;
+  left: -1280px;
+  right: -1280px;
+  width: 2560px;
+  height: 60px;
+  margin: 0 auto;
+  background: url(../img/sliderImg/banner-cover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/banner/banner-cover.png*/ center no-repeat;
+}
+
+.banner-cover-mb {
+  display: none;
+}
+
+.banner-main {
+  position: relative;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-top: 107px;
+  color: #333;
+  text-align: left;
+}
+
+.banner-main.not-pro {
+  padding-top: 100px;
+  text-align: center;
+}
+
+@media (max-width: 1200px) {
+  .banner-main {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+.banner-main .txt-01 {
+  font-size: 24px;
+  line-height: 44px;
+}
+
+.banner-main.not-pro .txt-01 {
+  display: inline-block;
+  padding: 0 5px;
+  color: #333;
+  font-size: 24px;
+  margin-left: 510px;
+  border-bottom: 2px solid #96abc4;
+  margin-bottom: 20px;
+}
+
+.banner-main.not-pro.ide .txt-01 strong {
+  font-weight: bold;
+}
+
+.banner-main .txt-02 {
+  font-size: 48px;
+  line-height: 68px;
+}
+
+.banner-main.not-pro .txt-02 {
+  color: #2b3033;
+  font-size: 70px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.banner-main .txt-03 {
+  font-size: 16px;
+  line-height: 36px;
+}
+
+.banner-main.not-pro .txt-03 {
+  color: #2b3033;
+  font-size: 30px;
+  text-align: center;
+}
+
+.banner-main .btn-banner {
+  width: 142px;
+  height: 40px;
+  margin-top: 35px;
+  background: #e41f2b;
+  font-size: 16px;
+  color: #fff;
+  line-height: 40px;
+  text-align: center;
+}
+
+.banner-main-bg {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 50%;
+  width: 1920px;
+  height: 560px;
+  margin-left: -960px;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.pagination {
+  position: absolute;
+  z-index: 20;
+  bottom: 150px;
+  width: 100%;
+  text-align: center;
+}
+
+.swiper-pagination-switch {
+  display: inline-block;
+  width: 50px;
+  height: 20px;
+  margin: 0 5px;
+  background: none;
+  border-bottom: 3px solid rgba(0, 0, 0, .2);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.swiper-active-switch {
+  border-bottom: 3px solid #e41f2b;
+}
+
+.banner-mb {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .banner-cover {
+    display: none;
+  }
+
+  .banner-cover-mb {
+    display: block;
+    position: absolute;
+    z-index: 9;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: url(../images/index-v3/banner/banner-cover-mb.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/banner/banner-cover-mb.png*/ center bottom no-repeat;
+    background-size: 100% auto;
+  }
+
+  .swiper-container {
+    height: auto
+  }
+
+  .swiper-wrapper,
+  .swiper-slide {
+    height: auto !important;
+  }
+
+  .banner-main {
+    display: none;
+  }
+
+  .banner-mb {
+    display: block;
+  }
+
+  .banner-mb img {
+    width: 100%;
+    display: block;
+  }
+
+  .pagination {
+    bottom: 10px;
+  }
+}
+
+@-webkit-keyframes fadeInFg {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(2%, 2%, 0);
+    transform: translate3d(2%, 2%, 0)
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none
+  }
+}
+
+@keyframes fadeInFg {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(2%, 2%, 0);
+    -ms-transform: translate3d(2%, 2%, 0);
+    transform: translate3d(2%, 2%, 0)
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none
+  }
+}
+
+.fadeInFg {
+  -webkit-animation-name: fadeInFg;
+  animation-name: fadeInFg
+}
+
+/* transition实现过场动画
+------------------------*/
+
+/* 进场transition： fadeIn */
+
+[slider-transition-enter-effect="transition-fadeIn"] {
+  opacity: 0;
+}
+
+[slider-transition-enter-effect="transition-fadeIn"][slider-transition-state="enter"] {
+  -webkit-transition-timing-function: ease;
+  transition-timing-function: ease;
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+/* 进场transition： fadeInUp */
+
+[slider-transition-enter-effect="transition-fadeInUp"] {
+  opacity: 0;
+  -webkit-transform: translate3d(0, 50px, 0);
+  -ms-transform: translate3d(0, 50px, 0);
+  transform: translate3d(0, 50px, 0);
+}
+
+[slider-transition-enter-effect="transition-fadeInUp"][slider-transition-state="enter"] {
+  -webkit-transition-timing-function: ease;
+  transition-timing-function: ease;
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+/* 进场transition： fadeInTopLeft-short */
+
+[slider-transition-enter-effect="transition-fadeInTopLeft-short"] {
+  opacity: 0;
+  -webkit-transform: translate3d(20px, 20px, 0);
+  -ms-transform: translate3d(20px, 20px, 0);
+  transform: translate3d(20px, 20px, 0);
+}
+
+[slider-transition-enter-effect="transition-fadeInTopLeft-short"][slider-transition-state="enter"] {
+  -webkit-transition-timing-function: ease;
+  transition-timing-function: ease;
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+/* 退场transition： fadeOut */
+
+[slider-transition-exit-effect="transition-fadeOut"][slider-transition-state="exit"] {
+  -webkit-transition-timing-function: ease;
+  transition-timing-function: ease;
+  opacity: 0;
+  -webkit-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+/* 退场transition： fadeOutUp */
+
+[slider-transition-exit-effect="transition-fadeOutUp"][slider-transition-state="exit"] {
+  -webkit-transition-timing-function: ease;
+  transition-timing-function: ease;
+  opacity: 0;
+  -webkit-transform: translate3d(0, -50px, 0);
+  -ms-transform: translate3d(0, -50px, 0);
+  transform: translate3d(0, -50px, 0);
+}
+
+/* endregion banner */
+
+/* region banner: product template */
+
+.slide-content-product .banner-main {
+  padding-top: 90px;
+}
+
+.banner-product-text {
+  position: relative;
+  z-index: 3;
+}
+
+.banner-product-text h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: #333333;
+  line-height: 36px;
+}
+
+.banner-product-text h2 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 48px;
+  color: #252b3a;
+  line-height: 60px;
+}
+
+.banner-product-text p {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #252b3a;
+  line-height: 22px;
+}
+
+.banner-product-text em {
+  font-style: normal;
+  color: #f66f6a;
+}
+
+.banner-product-text .aui-button,
+.banner-product-text .cui-btn {
+  margin-top: 30px;
+}
+
+.banner-product-text .btn-primary {
+  box-shadow: 0 10px 20px 0 rgba(239, 35, 54, 0.20);
+}
+
+.banner-product-text .aui-button + .aui-button {
+  margin-left: 7px;
+}
+
+.banner-product-image-main,
+.banner-product-image-sub {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: -190px;
+  width: 930px;
+  height: 560px;
+}
+
+/* 进场transition： fadeInBottomLeft-product */
+
+[slider-transition-enter-effect="transition-fadeInBottomLeft-product"] {
+  opacity: 0;
+  -webkit-transform: translate3d(104px, -71px, 0);
+  -ms-transform: translate3d(104px, -71px, 0);
+  transform: translate3d(104px, -71px, 0);
+}
+
+[slider-transition-enter-effect="transition-fadeInBottomLeft-product"][slider-transition-state="enter"] {
+  -webkit-transition-timing-function: ease;
+  transition-timing-function: ease;
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+  -ms-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+}
+
+/* endregion banner: product template */
+
+/* region banner: activity template */
+
+.slide-content-activity .banner-main {
+  height: 400px;
+  padding-top: 105px;
+  font-size: 0;
+  text-align: center;
+}
+
+.banner-activity-text {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  padding-left: 0px;
+}
+
+.banner-activity-text h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+  line-height: 36px;
+  color: #333;
+}
+
+.banner-activity-text h2 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 56px;
+  line-height: 70px;
+  color: #333;
+}
+
+.banner-activity-text p {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 18px;
+  line-height: 22px;
+  color: #333;
+}
+
+.banner-activity-text em {
+  font-style: normal;
+  color: #e41e2b;
+}
+
+.banner-activity-text .banner-activity-text-subp {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 18px;
+  color: #999;
+}
+
+.banner-activity-button-wrapper {
+  margin-top: 20px;
+}
+
+.banner-activity-button-wrapper .aui-button {
+  box-shadow: 0 10px 20px 0 rgba(239, 35, 54, 0.20);
+}
+
+/* endregion banner: activity template */
+
+/* region events */
+
+.home-events {
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-bottom: -38px;
+}
+
+.home-events-box {
+  max-width: 1210px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.home-events-box-wrapper {
+  width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 30px 40px 0 rgba(0, 0, 0, 0.10);
+}
+
+.home-events-box-wrapper:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.home-events-box-item {
+  position: relative;
+  float: left;
+  width: 25%;
+  height: 120px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 1);
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.home-events-box-item a {
+  display: block;
+  height: 100%;
+  padding: 34px 5px 34px 120px;
+}
+
+.home-events-box-item i {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  width: 60px;
+  height: 60px;
+}
+
+.home-events-box-item i img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-transition: opacity .2s;
+  transition: opacity .2s;
+  will-change: opacity;
+}
+
+.home-events-box-item i img:last-child {
+  opacity: 0;
+}
+
+.home-events-box-item h2,
+.home-events-box-item p {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.home-events-box-item h2 {
+  margin-bottom: 4px;
+  font-size: 18px;
+  line-height: 22px;
+  color: #3B516A;
+  -webkit-transition: .2s;
+  transition: .2s;
+  will-change: color;
+}
+
+.home-events-box-item p {
+  font-size: 14px;
+  line-height: 20px;
+  color: #95989D;
+}
+
+@media (min-width: 1024px) {
+  .home-events-box-item:hover {
+    background: rgba(255, 255, 255, 1);
+  }
+
+  .home-events-box-item:hover i img:first-child {
+    opacity: .5;
+  }
+
+  .home-events-box-item:hover i img:last-child {
+    opacity: 1;
+  }
+
+  .home-events-box-item:hover h2 {
+    color: #fa6f66;
+  }
+}
+
+.home-events-bar-wrapper {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .home-events {
+    position: relative;
+    bottom: 0;
+    background: white;
+  }
+
+  .home-events:before {
+    content: "";
+    display: table;
+  }
+
+  .home-events-bar {
+    position: static;
+    background: none;
+  }
+
+  .home-events-bar-wrapper {
+    height: auto;
+    padding-top: 11px;
+    padding-bottom: 11px;
+    border: none;
+  }
+
+  .home-events-bar-new {
+    width: 50px;
+    height: 22px;
+    margin-right: 10px;
+    background-size: auto 12px;
+  }
+
+  .home-events-bar-item {
+    width: calc(100% - 60px);
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .home-events-bar-item + .home-events-bar-item,
+  .home-event-bar-more {
+    display: none;
+  }
+
+  .home-events-box {
+    display: block;
+    margin-top: -50px;
+  }
+
+  .home-events-box:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  .home-events-box-wrapper {
+    border: none;
+    box-shadow: none;
+  }
+
+  .home-events-box-item {
+    display: block;
+    float: left;
+    width: calc((100% - 5px) / 2);
+    height: 100px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 30px 40px 0 rgba(0, 0, 0, 0.10);
+  }
+
+  .home-events-box-item:nth-child(2n) {
+    margin-left: 5px;
+  }
+
+  .home-events-box-item:nth-child(2) ~ .home-events-box-item {
+    margin-top: 5px;
+  }
+
+  .home-events-box-item a {
+    padding: 8px 0;
+  }
+
+  .home-events-box-item i {
+    position: relative;
+    top: auto;
+    left: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .home-events-box-item h2 {
+    margin-top: 5px;
+    margin-bottom: 0;
+    font-size: 14px;
+    line-height: 18px;
+    text-align: center;
+  }
+
+  .home-events-box-item p {
+    display: none;
+  }
+}
+
+/* endregion events */
+
+/* region util: media query for js*/
+
+title {
+  font-size: 21px;
+}
+
+@media (min-width: 768px) {
+  title {
+    font-size: 22px;
+  }
+}
+
+@media (min-width: 1024px) {
+  title {
+    font-size: 23px;
+  }
+}
+
+@media (min-width: 1280px) {
+  title {
+    font-size: 24px;
+  }
+}
+
+@media (min-width: 1366px) {
+  title {
+    font-size: 25px;
+  }
+}
+
+@media (min-width: 1680px) {
+  title {
+    font-size: 26px;
+  }
+}
+
+/* endregion util: media query for js*/
+
+/* region .float-bar-ad */
+/* 隐藏右下角广告 */
+.float-bar-ad {
+  display: none;
+}
+/* endregion  */
+
+/* region section-nav */
+.section-nav {
+  position: fixed;
+  z-index: 90;
+  top: 75%;
+  right: 34px;
+  padding-right: 5px;
+  opacity: 0;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  -webkit-transition: top .5s cubic-bezier(0.17, 0, 0.28, 0.99), opacity .5s cubic-bezier(.42, 0, .58, 1) .05s;
+  transition: top .5s cubic-bezier(0.17, 0, 0.28, 0.99), opacity .5s cubic-bezier(.42, 0, .58, 1) .05s;
+}
+
+.section-nav a {
+  display: block;
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #A0A2A8;
+  cursor: pointer;
+  /*-ms-transform: scale(0);*/
+  /*transform: scale(0);*/
+  /*-webkit-transition: transform cubic-bezier(.42, 0, .58, 1) .5s, margin-top cubic-bezier(0.17, 0, 0.28, 0.99) .5s;*/
+  /*transition: transform cubic-bezier(.42, 0, .58, 1) .5s, margin-top cubic-bezier(0.17, 0, 0.28, 0.99) .5s;*/
+  -webkit-transition: margin-top cubic-bezier(0.17, 0, 0.28, 0.99) .5s;
+  transition: margin-top cubic-bezier(0.17, 0, 0.28, 0.99) .5s;
+}
+
+.section-nav a + a {
+  margin-top: -10px;
+}
+
+/* 退场 */
+/*.section-nav a:nth-last-child(1) {
+    -webkit-transition-delay: 0.05s, 0s;
+    transition-delay: 0.05s, 0s;
+}
+
+.section-nav a:nth-last-child(2) {
+    -webkit-transition-delay: 0.1s, 0s;
+    transition-delay: 0.1s, 0s;
+}
+
+.section-nav a:nth-last-child(3) {
+    -webkit-transition-delay: 0.15s, 0s;
+    transition-delay: 0.15s, 0s;
+}
+
+.section-nav a:nth-last-child(4) {
+    -webkit-transition-delay: 0.2s, 0s;
+    transition-delay: 0.2s, 0s;
+}
+
+.section-nav a:nth-last-child(5) {
+    -webkit-transition-delay: 0.25s, 0s;
+    transition-delay: 0.25s, 0s;
+}
+
+.section-nav a:nth-last-child(6) {
+    -webkit-transition-delay: 0.3s, 0s;
+    transition-delay: 0.3s, 0s;
+}
+
+.section-nav a:nth-last-child(7) {
+    -webkit-transition-delay: 0.35s, 0s;
+    transition-delay: 0.35s, 0s;
+}
+
+.section-nav a:nth-last-child(8) {
+    -webkit-transition-delay: 0.4s, 0s;
+    transition-delay: 0.4s, 0s;
+}
+
+.section-nav a:nth-last-child(9) {
+    -webkit-transition-delay: 0.45s, 0s;
+    transition-delay: 0.45s, 0s;
+}
+
+.section-nav a:nth-last-child(10) {
+    -webkit-transition-delay: 0.5s, 0s;
+    transition-delay: 0.5s, 0s;
+}*/
+
+.section-nav a > span {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #F66F6A;
+  border-radius: 50%;
+  opacity: 0;
+  -ms-transform: scale(0);
+  transform: scale(0);
+  -webkit-transition: .2s ease-out;
+  transition: .2s ease-out;
+}
+
+.section-nav a.active > span {
+  opacity: 1;
+  -ms-transform: scale(1);
+  transform: scale(1);
+  -webkit-transition: .4s ease-out;
+  transition: .4s ease-out;
+}
+
+.section-nav a div {
+  position: absolute;
+  right: 0;
+  z-index: 1;
+  top: -5px;
+  height: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 10px;
+  background: #A0A2A8;
+  white-space: nowrap;
+  -ms-transform: scale(.5);
+  transform: scale(.5);
+  -ms-transform-origin: right center;
+  transform-origin: right center;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.section-nav a div span {
+  display: inline-block;
+  position: absolute;
+  right: 10px;
+  font-size: 14px;
+  line-height: 20px;
+  color: white;
+  opacity: 0;
+  -ms-transform-origin: right center;
+  transform-origin: right center;
+  -ms-transform: scale(0);
+  transform: scale(0);
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.section-nav a:not(.hover) div {
+  width: 20px !important;
+}
+
+.section-nav a.hover div {
+  background-color: #F66F6A;
+  -ms-transform: scale(1);
+  transform: scale(1);
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+
+.section-nav a.active div {
+  -webkit-transition: all .3s, background 0s .3s;
+  transition: all .3s, background 0s .3s;
+}
+
+.section-nav a.active.hover div {
+  -webkit-transition: all .3s, background 0s;
+  transition: all .3s, background 0s;
+}
+
+.section-nav a.hover div span {
+  opacity: 1;
+  -ms-transform: scale(1);
+  transform: scale(1);
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+
+.section-nav.show {
+  top: 50%;
+  opacity: 1;
+  -webkit-transition: top .7s cubic-bezier(0.17, 0, 0.28, 0.99), opacity .1s cubic-bezier(0, 0, .58, 1) .05s;
+  transition: top .7s cubic-bezier(0.17, 0, 0.28, 0.99), opacity .1s cubic-bezier(0, 0, .58, 1) .05s;
+}
+
+.section-nav.show a {
+  /*-ms-transform: scale(1);*/
+  /*transform: scale(1);*/
+  /*-webkit-transition: transform cubic-bezier(.42, 0, .58, 1) .7s, margin-top cubic-bezier(0.17, 0, 0.28, 0.99) .7s;*/
+  /*transition: transform cubic-bezier(.42, 0, .58, 1) .7s, margin-top cubic-bezier(0.17, 0, 0.28, 0.99) .7s;*/
+  -webkit-transition: margin-top cubic-bezier(0.17, 0, 0.28, 0.99) .7s;
+  transition: margin-top cubic-bezier(0.17, 0, 0.28, 0.99) .7s;
+}
+
+.section-nav.show a + a {
+  margin-top: 10px;
+}
+
+/* 进场 */
+/*.section-nav.show a:nth-child(1) {
+    -webkit-transition-delay: 0.05s, 0s;
+    transition-delay: 0.05s, 0s;
+}
+
+.section-nav.show a:nth-child(2) {
+    -webkit-transition-delay: 0.1s, 0s;
+    transition-delay: 0.1s, 0s;
+}
+
+.section-nav.show a:nth-child(3) {
+    -webkit-transition-delay: 0.15s, 0s;
+    transition-delay: 0.15s, 0s;
+}
+
+.section-nav.show a:nth-child(4) {
+    -webkit-transition-delay: 0.2s, 0s;
+    transition-delay: 0.2s, 0s;
+}
+
+.section-nav.show a:nth-child(5) {
+    -webkit-transition-delay: 0.25s, 0s;
+    transition-delay: 0.25s, 0s;
+}
+
+.section-nav.show a:nth-child(6) {
+    -webkit-transition-delay: 0.3s, 0s;
+    transition-delay: 0.3s, 0s;
+}
+
+.section-nav.show a:nth-child(7) {
+    -webkit-transition-delay: 0.35s, 0s;
+    transition-delay: 0.35s, 0s;
+}
+
+.section-nav.show a:nth-child(8) {
+    -webkit-transition-delay: 0.4s, 0s;
+    transition-delay: 0.4s, 0s;
+}
+
+.section-nav.show a:nth-child(9) {
+    -webkit-transition-delay: 0.45s, 0s;
+    transition-delay: 0.45s, 0s;
+}
+
+.section-nav.show a:nth-child(10) {
+    -webkit-transition-delay: 0.5s, 0s;
+    transition-delay: 0.5s, 0s;
+}*/
+
+@media (max-width: 1023px) {
+  .section-nav {
+    display: none;
+  }
+}
+
+@media (max-height: 599px) {
+  .section-nav {
+    display: none;
+  }
+}
+
+/* endregion section-nav */
+
+/* region section common style */
+
+.home-section h2,
+.home-section p {
+  text-align: justify;
+}
+
+.section-head {
+  max-width: 1210px;
+  padding: 50px 15px 40px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.section-head h2 {
+  margin-bottom: 10px;
+  font-size: 36px;
+  line-height: 46px;
+  text-align: center;
+  color: #3B516A;
+}
+
+.section-head p {
+  font-size: 18px;
+  line-height: 22px;
+  text-align: center;
+  color: #999;
+}
+
+.section-more-wrap {
+  padding-top: 40px;
+  padding-bottom: 50px;
+  text-align: center;
+}
+
+.section-more-wrap a {
+  display: inline-block;
+  font-size: 18px;
+  line-height: 22px;
+  color: #999;
+  cursor: pointer;
+}
+
+.section-more-wrap a em {
+  content: "";
+  display: inline-block;
+  width: 13px;
+  height: 8px;
+  vertical-align: middle;
+  margin-top: -4px;
+  margin-left: 10px;
+  background: url(../img/news-btn-more.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/news-btn-more.png*/ no-repeat;
+  background-size: cover;
+  transition: 0.3s ease-out;
+}
+
+@media (min-width: 1024px) {
+  .section-more-wrap a:hover {
+    color: #fa6f66;
+    border-color: #fa6f66;
+  }
+
+  .section-more-wrap a:hover em {
+    -ms-transform: translate(4px, 0);
+    transform: translate(4px, 0);
+    background: url(../img/news-btn-more-1.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/news-btn-more-1.png*/ no-repeat;
+  }
+}
+
+@media (max-width: 1023px) {
+  .section-head {
+    padding: 25px 15px;
+  }
+
+  .section-more-wrap {
+    padding-top: 15px;
+    padding-bottom: 25px;
+  }
+
+  .section-more-wrap a {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .section-head h2 {
+    margin-bottom: 3px;
+    font-size: 21px;
+    line-height: 30px;
+  }
+
+  .section-head p {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+/* endregion section common style*/
+
+/* region section: product */
+
+.section-product {
+  background: #fff;
+}
+
+.product-nav-tabs {
+  overflow: hidden;
+  max-width: 1210px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.product-nav-tabs > li {
+  float: left;
+  width: 25%;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.product-nav-tabs[data-cols="5"] > li {
+  width: 20%;
+}
+
+.product-nav-tabs[data-cols="6"] > li {
+  width: calc(100% / 6);
+}
+
+.product-nav-tabs[data-cols="7"] > li {
+  width: calc(100% / 7);
+}
+
+.product-nav-tabs[data-cols="8"] > li {
+  width: 12.5%;
+}
+
+.product-nav-tabs i {
+  display: block;
+  width: 48px;
+  height: 48px;
+  margin-left: auto;
+  margin-right: auto;
+  background-size: 100% 100%;
+}
+
+.product-nav-tabs > li > a {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.product-nav-tabs i:before {
+  content: "";
+  width: 0;
+  height: 0;
+}
+
+.product-nav-tabs p {
+  display: inline-block;
+  position: relative;
+  height: 42px;
+  padding-left: 20.5px;
+  padding-right: 20.5px;
+  margin-top: 10px;
+  font-size: 18px;
+  line-height: 22px;
+  text-align: center;
+  color: #8A8D93;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.product-nav-tabs p:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  right: 51%;
+  height: 4px;
+  background: #FA6F66;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+@media (min-width: 1024px) {
+  .product-nav-tabs a:hover p {
+    color: #FA6F66;
+  }
+}
+
+.product-nav-tabs > li.active p {
+  color: #FA6F66;
+}
+
+.product-nav-tabs > li.active p:after {
+  left: 0;
+  right: 0;
+}
+
+.product-tab-content {
+  overflow: hidden;
+  background: #f1f3ff;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+}
+
+.product-tab-panel {
+  display: none;
+  max-width: 1210px;
+  padding: 20px 15px 30px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.product-tab-panel:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.product-tab-panel.active {
+  display: block;
+}
+
+.product-tab-panel > ul {
+  float: left;
+}
+
+.product-tab-panel > ul:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.product-list-left {
+  width: 33.33333%;
+}
+
+.product-list-right {
+  width: 66.66666%;
+}
+
+.product-list-left .product-left-item {
+  padding: 0 34px 0 30px;
+  height: 219px;
+}
+
+.product-left-item {
+  -webkit-transition: all .5s;
+  transition: all .5s;
+}
+
+.product-left-item-wrap {
+  padding-top: 30px;
+}
+
+.product-left-item-wrap a h2 {
+  font-size: 22px;
+  color: #34475F;
+  line-height: 18px;
+  margin-bottom: 10px;
+}
+
+.product-left-item-wrap a p {
+  font-size: 14px;
+  color: #95989D;
+  line-height: 22px;
+  height: 66px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.product-left-item-wrap .details {
+  height: 55px;
+  color: #F56F69;
+}
+
+.product-left-item-wrap .details a {
+  display: inline-block;
+  width: 116px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #F56F69;
+  border-radius: 2px;
+}
+
+.product-left-item-wrap .details span {
+  height: 40px;
+  line-height: 40px;
+  font-size: 18px;
+  margin-left: 10px;
+}
+
+.product-left-item-wrap .details > a:hover {
+  color: #fff;
+  background: #FA6F66;
+}
+
+.product-list-right > .product-item > a {
+  width: 50%;
+}
+
+.product-list:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.product-item {
+  display: inline;
+}
+
+.product-item > a {
+  position: relative;
+  float: left;
+  width: 33.333333%;
+  height: 146px;
+  padding: 20px 40px 20px 40px;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+}
+
+/*.caret-new {
+  display: inline-block;
+  width: 36px;
+  height: 16px;
+  margin-top: -2px;
+  margin-left: 10px;
+  line-height: 16px;
+  background: #FA6F66;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.caret-new:before {
+  content: "NEW";
+}*/
+
+.product-item > a h2 {
+  margin-bottom: 9px;
+  font-size: 18px;
+  line-height: 22px;
+  color: #3B516A;
+}
+
+.tip {
+  display: inline-block;
+  width: 38px;
+  height: 18px;
+  background-size: cover;
+  vertical-align: middle;
+}
+
+.tip.preferential {
+  background-image: url(../img/product/preferential.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/product/preferential.png?sttl=0817008*/;
+}
+
+.tip.hot {
+  background-image: url(../img/product/hot.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/product/hot.png?sttl=0817008*/;
+}
+
+.tip.new {
+  background-image: url(../img/product/new.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/product/new.png?sttl=0817008*/;
+}
+
+.product-item > a p {
+  height: 66px;
+  font-size: 14px;
+  line-height: 22px;
+  color: #95989D;
+  overflow: hidden;
+}
+
+/*.product-item > a:after {
+  content: "";
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-right: solid 1px #FA6F66;
+  border-top: solid 1px #FA6F66;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  -webkit-transition: .2s;
+  transition: .2s;
+}*/
+
+@media (min-width: 1024px) {
+  .product-left-item:hover h2,
+  .product-item > a:hover h2 {
+    color: #FA6F66;
+  }
+
+  .product-left-item:hover,
+  .product-item > a:hover {
+    border-radius: 2px;
+    background-color: white;
+    box-shadow: 0 30px 40px 0 rgba(130, 98, 98, 0.1);
+  }
+
+  .product-item > a:hover:after {
+    opacity: 1;
+  }
+}
+
+/* 产品区域icon 设置 */
+.product-icon-calc,
+li.active .product-icon-calc:before {
+  background-image: url(../img/product/icon-calc.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-calc.svg?sttl=0817008*/;
+}
+
+/*.product-icon-calc:before,
+li.active .product-icon-calc {
+    background-image: url(../images/index-v2/product/icon-calc-active.svg?sttl=0817008);
+}*/
+
+.product-icon-disk {
+  background-image: url(../img/product/icon-disk.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-disk.svg?sttl=0817008*/;
+}
+
+/*.product-icon-disk:before,
+li.active .product-icon-disk {
+    background-image: url(../images/index-v2/product/icon-disk-active.svg?sttl=0817008);
+}*/
+
+.product-icon-web {
+  background-image: url(../img/product/icon-web.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-web.svg?sttl=0817008*/;
+}
+
+/*.product-icon-web:before,
+li.active .product-icon-web {
+    background-image: url(../images/index-v2/product/icon-web-active.svg?sttl=0817008);
+}*/
+
+.product-icon-safe {
+  background-image: url(../img/product/icon-safe.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-safe.svg?sttl=0817008*/;
+}
+
+/*.product-icon-safe:before,
+li.active .product-icon-safe {
+    background-image: url(../images/index-v2/product/icon-safe-active.svg?sttl=0817008);
+}*/
+
+.product-icon-datalib {
+  background-image: url(../img/product/icon-datalib.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-datalib.svg?sttl=0817008*/;
+}
+
+/*.product-icon-datalib:before,
+li.active .product-icon-datalib {
+    background-image: url(../images/index-v2/product/icon-datalib-active.svg?sttl=0817008);
+}*/
+
+.product-icon-analysis {
+  background-image: url(../img/product/icon-analysis.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-analysis.svg?sttl=0817008*/;
+}
+
+/*.product-icon-analysis:before,
+li.active .product-icon-analysis {
+    background-image: url(../images/index-v2/product/icon-analysis-active.svg?sttl=0817008);
+}*/
+
+.product-icon-develop {
+  background-image: url(../img/product/icon-develop.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-develop.svg?sttl=0817008*/;
+}
+
+/*.product-icon-develop:before,
+li.active .product-icon-develop {
+    background-image: url(../images/index-v2/product/icon-develop-active.svg?sttl=0817008);
+}*/
+
+.product-icon-new {
+  background-image: url(../img/product/icon-new.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-new.svg?sttl=0817008*/;
+}
+
+/*.product-icon-new:before,
+li.active .product-icon-new {
+    background-image: url(../images/index-v2/product/icon-new-active.svg?sttl=0817008);
+}*/
+
+.product-icon-service {
+  background-image: url(../img/product/icon-service.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-service.svg?sttl=0817008*/;
+}
+
+/*.product-icon-service:before,
+li.active .product-icon-service {
+    background-image: url(../images/index-v2/product/icon-service-active.svg?sttl=0817008);
+}*/
+
+.product-icon-manage {
+  background-image: url(../img/product/icon-manage.svg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v2/product/icon-manage.svg?sttl=0817008*/;
+}
+
+/*.product-icon-manage:before,
+li.active .product-icon-manage {
+    background-image: url(../images/index-v2/product/icon-manage-active.svg?sttl=0817008);
+}*/
+
+.product-body-mb {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .section-product {
+    background-color: #F1F3FF;
+  }
+
+  .product-body-pc {
+    display: none;
+  }
+
+  .product-body-mb {
+    display: block;
+  }
+
+  .product-nav-tabs > li {
+    width: calc(50% - 1px);
+    padding-top: 0;
+    margin-top: 2px;
+    background: white;
+  }
+
+  .product-nav-tabs:first-child > li {
+    margin-top: 0;
+  }
+
+  .product-nav-tabs > li + li {
+    margin-left: 2px;
+  }
+
+  .product-nav-tabs > li > a {
+    display: block;
+    position: relative;
+    height: 75px;
+    padding-left: 59px;
+    font-size: 0;
+    line-height: 75px;
+    text-align: left;
+  }
+
+  .product-nav-tabs > li > a:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    right: 50%;
+    bottom: 0;
+    height: 2px;
+    background-color: #FA6F66;
+    -webkit-transition: .2s;
+    transition: .2s;
+  }
+
+  .product-nav-tabs > li.active > a:before {
+    left: 0;
+    right: 0;
+  }
+
+  .product-nav-tabs i {
+    position: absolute;
+    top: 50%;
+    left: 25px;
+    width: 24px;
+    height: 24px;
+    margin-top: -12px;
+  }
+
+  .product-nav-tabs p {
+    display: inline-block;
+    height: auto;
+    padding: 0;
+    margin-top: 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: #34475F;
+    vertical-align: middle;
+  }
+
+  .product-tab-content {
+    margin-left: 15px;
+    margin-right: 15px;
+    background: white;
+    -webkit-transition: all .5s;
+    transition: all .5s;
+  }
+
+  .product-tab-content.active {
+    /*margin-top: 2px;*/
+  }
+
+  .product-nav-tabs p:after {
+    content: none;
+  }
+
+  .product-tab-panel {
+    border-top: solid 2px #DEE6EE;
+    padding: 22px 0;
+  }
+
+  .product-list-left {
+    width: 100%;
+  }
+
+  .product-list-right {
+    padding-top: 22px;
+    width: 100%;
+  }
+
+  .product-list-left .product-left-item {
+    height: auto;
+    padding: 0 15px;
+  }
+
+  .product-left-item-wrap {
+    padding-top: 0;
+  }
+
+  .product-left-item-wrap a h2 {
+    line-height: 20px;
+    font-size: 14px;
+  }
+
+  .product-left-item-wrap a p {
+    font-size: 12px;
+    line-height: 16px;
+    height: 33px;
+    margin-bottom: 10px;
+  }
+
+  .product-left-item-wrap .details {
+    padding-bottom: 25px;
+  }
+
+  .product-left-item-wrap .details a {
+    width: 110px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 12px;
+  }
+
+  .product-list-right > .product-item > a {
+    width: 100%;
+    padding: 0 15px;
+  }
+
+  .product-left-item-wrap .details span {
+    height: 30px;
+    line-height: 30px;
+    font-size: 12px;
+  }
+
+  .product-left-item:last-child .product-left-item-wrap .details {
+    border-bottom: 1px dashed rgba(52, 71, 95, .3);
+  }
+
+  .product-list {
+    padding: 0 30px;
+    background: white;
+  }
+
+  .product-item {
+    display: list-item;
+  }
+
+  .product-item > a h2 {
+    line-height: 20px;
+    font-size: 14px;
+  }
+
+  .product-item + .product-item {
+    margin-top: 22.5px;
+  }
+
+  .product-item > a {
+    float: none;
+    display: block;
+    width: auto;
+    height: auto;
+    padding: 0;
+  }
+
+  .product-item > a p {
+    height: auto;
+    line-height: 16px;
+    font-size: 12px;
+  }
+
+  .tip {
+    width: 32px;
+    height: 15px;
+  }
+}
+
+/* endregion section: product */
+
+/* region section: solution*/
+
+.section-solution {
+  background: #1D213B;
+}
+
+.section-solution .solution-bg {
+  background: url(../img/solution/solution-pc.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/solution/solution-pc.png*/ no-repeat;
+  background-size: cover;
+}
+
+.section-solution .section-head h2 {
+  color: #FAFBFE;
+}
+
+.section-solution .section-head p {
+  color: #FFFFFF;
+  opacity: 0.6;
+}
+
+.section-solution .button {
+  border: 1px solid #FAFBFE;
+  border-radius: 4px;
+  height: 40px;
+  width: 140px;
+  margin: 20px 0 0 0;
+  line-height: 30px;
+  font-size: 14px;
+  color: #FAFBFE;
+  padding-left: 30px;
+}
+
+.section-solution .button em {
+  width: 13px;
+  height: 8px;
+  margin-left: 10px;
+  display: inline-block;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAAAXNSR0IArs4c6QAAAGRJREFUGBm1jkEKgDAMBKtYf+JJ3yM+UrS+RlD8inEivVr2YmAgbWeThvBHmVmCBRp5PnILF5zee7BS0lnecW/o3xCXB4dOGYCT1E0ReQbfNEK5+EWEDVbvy3Z+RZxggFoKfEkPa309oQKxul4AAAAASUVORK5CYII=") no-repeat;
+  background-size: cover;
+  transition: margin-left 0.3s ease-out;
+}
+
+.section-solution .button:hover {
+  color: #fa6f66;
+  border: 1px solid #fa6f66;
+}
+
+.section-solution .button:hover em {
+  margin-left: 15px;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAAAXNSR0IArs4c6QAAAI1JREFUGBljYCADMBLS87sgfQPDf4Z/LIKSYYwNDX9A6pkIaWIRkAz7z8ig//vDs+v/GxrYQOoJ2gRSBFL8+8Pz60DWP1YBKW2wpl/56beAAqogBYQAIyPDBuJsmpnG+uc6wxqggf9YNBnCCGr6j64hfdZvFkLO+XuDKZiFhaGagUfiGmN6wz9C6nHKAwAcay6AxWqjRQAAAABJRU5ErkJggg==") no-repeat;
+}
+
+.section-solution .solution-nav-list i {
+  display: none;
+}
+
+.section-solution .solution-nav-list li {
+  width: 240px;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.15);
+  padding-left: 30px;
+  margin: 0 10px;
+  position: relative;
+}
+
+.section-solution .solution-nav-list li h2 {
+  font-size: 18px;
+  color: #FFFFFF;
+  line-height: 72px;
+}
+
+.section-solution .solution-nav-list li a {
+  display: none;
+}
+
+.section-solution .solution-nav-list li.active {
+  width: 260px;
+  margin: 0;
+  padding-left: 40px;
+  background-image: linear-gradient(-180deg, #F67E78 0%, #F56F69 63%);
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#F67E78, endColorstr=#F56F69);
+  /*IE<9>*/
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient (GradientType=0, startColorstr=#F67E78, endColorstr=#F56F69)";
+  /*IE8+*/
+}
+
+.section-solution .solution-detial {
+  margin-left: 300px;
+  display: block;
+  padding: 20px 10px 0 10px;
+  overflow: hidden;
+}
+
+.section-solution .solution-detial .solution-detial-item.active {
+  display: block;
+}
+
+.section-solution .child-list {
+  width: 100%;
+  position: relative;
+}
+
+.section-solution .child-list .list-item {
+  padding: 10px 20px 10px 0;
+  width: 213px;
+  float: left;
+}
+
+.section-solution .child-list .list-item a {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  height: 40px;
+  padding-left: 50px;
+  display: block;
+  position: relative;
+}
+
+.section-solution .child-list .list-item a:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.section-solution .child-list .list-item p {
+  font-size: 14px;
+  color: #FFFFFF;
+  line-height: 40px;
+}
+
+.section-solution .child-list .list-item i {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  left: 20px;
+  top: 8px;
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.section-solution .child-list:after {
+  display: block;
+  content: '';
+  clear: both;
+}
+
+.section-solution .child-list.case .list-item a {
+  height: 70px;
+  border: none;
+  display: block;
+  margin: 1px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: default;
+}
+
+.section-solution .child-list.case .list-item a:hover {
+  background-color: transparent;
+}
+
+.section-solution .solution-detial-item {
+  display: none;
+}
+
+.section-solution .solution-detial-item li {
+  padding: 20px 0;
+}
+
+.section-solution .solution-detial-item li h2 {
+  font-size: 22px;
+  line-height: 28px;
+  color: #FFFFFF;
+  margin: 0 0 15px 0;
+}
+
+.section-solution .solution-detial-item li p {
+  opacity: 0.8;
+  font-size: 14px;
+  color: #FFFFFF;
+  line-height: 22px;
+}
+
+.section-solution .solution-detial-item li .line-title {
+  position: relative;
+}
+
+.section-solution .solution-detial-item li .line-title span {
+  border-top: 1px solid white;
+  opacity: 0.2;
+  display: inline-block;
+  width: 100%;
+  position: absolute;
+  margin-left: 135px;
+  top: 12px;
+}
+
+.section-solution .solution-detial-item li h3 {
+  font-size: 18px;
+  color: #FFFFFF;
+  width: 135px;
+}
+
+.section-solution .solution-detial-item li .more {
+  font-size: 14px;
+  color: #FFFFFF;
+  cursor: pointer;
+  line-height: 40px;
+  padding-left: 0;
+  text-align: center;
+}
+
+.section-solution .solution-detial-item li .more em {
+  width: 13px;
+  height: 8px;
+  margin-left: 10px;
+  display: inline-block;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAAAXNSR0IArs4c6QAAAGRJREFUGBm1jkEKgDAMBKtYf+JJ3yM+UrS+RlD8inEivVr2YmAgbWeThvBHmVmCBRp5PnILF5zee7BS0lnecW/o3xCXB4dOGYCT1E0ReQbfNEK5+EWEDVbvy3Z+RZxggFoKfEkPa309oQKxul4AAAAASUVORK5CYII=") no-repeat;
+  background-size: cover;
+  transition: -ms-transform 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.section-solution .solution-detial-item li .more:hover {
+  color: #fa6f66;
+  background: none;
+  border: 1px solid #fa6f66;
+}
+
+.section-solution .solution-detial-item li .more:hover em {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAJCAYAAADpeqZqAAAAAXNSR0IArs4c6QAAAI1JREFUGBljYCADMBLS87sgfQPDf4Z/LIKSYYwNDX9A6pkIaWIRkAz7z8ig//vDs+v/GxrYQOoJ2gRSBFL8+8Pz60DWP1YBKW2wpl/56beAAqogBYQAIyPDBuJsmpnG+uc6wxqggf9YNBnCCGr6j64hfdZvFkLO+XuDKZiFhaGagUfiGmN6wz9C6nHKAwAcay6AxWqjRQAAAABJRU5ErkJggg==") no-repeat;
+  -ms-transform: translate(5px, 0);
+  transform: translate(5px, 0);
+}
+
+.section-solution .section-more-wrap {
+  display: block;
+}
+
+.section-solution .section-more-wrap .pc {
+  display: inline-block;
+}
+
+.section-solution .section-more-wrap .mb {
+  display: none;
+}
+
+.section-solution .solution-wrapper {
+  background: none;
+}
+
+.section-solution .solution-nav {
+  width: 300px;
+  float: left;
+}
+
+.section-solution .solution-body {
+  max-width: 1172px;
+  margin: 0 auto;
+}
+
+.section-solution .solution-body:after {
+  clear: both;
+  content: '';
+  display: block;
+}
+
+/* .section-solution .gamecontainer {
+    background: url("data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20width%3D%2236px%22%20height%3D%2242px%22%20viewBox%3D%220%200%2036%2042%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%0A%20%20%20%20%3C!--%20Generator%3A%20Sketch%2049.3%20(51167)%20-%20http%3A%2F%2Fwww.bohemiancoding.com%2Fsketch%20--%3E%0A%20%20%20%20%3Ctitle%3Egamecontainer%3C%2Ftitle%3E%0A%20%20%20%20%3Cdesc%3ECreated%20with%20Sketch.%3C%2Fdesc%3E%0A%20%20%20%20%3Cdefs%3E%3C%2Fdefs%3E%0A%20%20%20%20%3Cg%20id%3D%22Page-1%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22gamecontainer%22%20fill%3D%22%23FFFFFF%22%20fill-rule%3D%22nonzero%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Group%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M31.332%2C33.924%20C30.992%2C33.924%2030.661%2C33.751%2030.474%2C33.439%20C30.19%2C32.965%2030.343%2C32.351%2030.817%2C32.067%20L34%2C30.156%20L34%2C11.73%20L24.835%2C6.393%20C24.357%2C6.115%2024.196%2C5.503%2024.474%2C5.025%20C24.752%2C4.547%2025.363%2C4.385%2025.841%2C4.664%20L35.503%2C10.29%20C35.811%2C10.47%2036%2C10.799%2036%2C11.155%20L36%2C30.722%20C36%2C31.074%2035.815%2C31.399%2035.515%2C31.579%20L31.846%2C33.78%20C31.685%2C33.878%2031.507%2C33.924%2031.332%2C33.924%20Z%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M1%2C23.773%20C0.448%2C23.773%200%2C23.326%200%2C22.773%20L0%2C11.277%20C0%2C10.916%200.195%2C10.583%200.509%2C10.406%20L17.875%2C0.621%20C18.18%2C0.45%2018.551%2C0.449%2018.856%2C0.621%20L22.771%2C2.822%20C23.252%2C3.093%2023.423%2C3.702%2023.153%2C4.184%20C22.882%2C4.665%2022.273%2C4.837%2021.791%2C4.565%20L18.366%2C2.64%20L2%2C11.861%20L2%2C22.773%20C2%2C23.326%201.552%2C23.773%201%2C23.773%20Z%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M18%2C41.507%20C17.83%2C41.507%2017.659%2C41.463%2017.506%2C41.376%20L0.505%2C31.714%20C0.193%2C31.536%200%2C31.204%200%2C30.845%20L0%2C26.074%20C0%2C25.521%200.448%2C25.074%201%2C25.074%20C1.552%2C25.074%202%2C25.521%202%2C26.074%20L2%2C30.262%20L18%2C39.356%20L28.269%2C33.522%20C28.75%2C33.248%2029.36%2C33.418%2029.632%2C33.897%20C29.905%2C34.377%2029.737%2C34.988%2029.257%2C35.26%20L18.496%2C41.375%20C18.341%2C41.463%2018.171%2C41.507%2018%2C41.507%20Z%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Group%22%20transform%3D%22translate(7.000000%2C%2014.000000)%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M19.391%2C14.202%20C19.229%2C14.241%2019.071%2C14.259%2018.909%2C14.259%20C17.883%2C14.259%2016.944%2C13.52%2016.204%2C12.113%20L16.061%2C11.842%20L7.044%2C11.842%20L6.9%2C12.113%20C6.057%2C13.715%204.93%2C14.433%203.712%2C14.154%20C2.044%2C13.775%201.257%2C10.464%202.027%2C7.065%20C2.751%2C3.889%204.592%2C1.401%206.221%2C1.401%20C6.329%2C1.401%206.439%2C1.415%206.543%2C1.436%20C7.096%2C1.561%207.586%2C2.098%207.95%2C2.551%20L8.099%2C2.739%20L14.993%2C2.739%20L15.145%2C2.551%20C15.51%2C2.098%2016%2C1.561%2016.551%2C1.436%20C18.194%2C1.065%2020.299%2C3.78%2021.072%2C7.166%20C21.844%2C10.535%2021.057%2C13.827%2019.391%2C14.202%20M22.063%2C6.941%20C21.213%2C3.209%2018.981%2C0.39%2016.872%2C0.39%20C16.688%2C0.39%2016.514%2C0.408%2016.34%2C0.449%20C15.573%2C0.623%2014.977%2C1.193%2014.527%2C1.728%20L8.59%2C1.728%20C8.139%2C1.193%207.539%2C0.624%206.777%2C0.449%20C6.597%2C0.408%206.416%2C0.388%206.228%2C0.388%20C4.078%2C0.388%201.898%2C3.101%201.044%2C6.841%20C0.12%2C10.899%201.22%2C14.623%203.489%2C15.137%20C3.733%2C15.194%203.981%2C15.223%204.225%2C15.223%20C5.178%2C15.223%206.528%2C14.803%207.649%2C12.852%20L15.461%2C12.852%20C16.36%2C14.415%2017.577%2C15.27%2018.909%2C15.27%20C19.143%2C15.27%2019.387%2C15.244%2019.616%2C15.188%20C21.881%2C14.675%2022.979%2C10.975%2022.063%2C6.941%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M16.725%2C4.697%20C16.252%2C4.697%2015.871%2C5.082%2015.871%2C5.552%20C15.871%2C6.022%2016.252%2C6.407%2016.725%2C6.407%20C17.2%2C6.407%2017.582%2C6.022%2017.582%2C5.552%20C17.582%2C5.082%2017.197%2C4.697%2016.725%2C4.697%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M16.725%2C8.504%20C16.252%2C8.504%2015.871%2C8.887%2015.871%2C9.358%20C15.871%2C9.832%2016.252%2C10.213%2016.725%2C10.213%20C17.2%2C10.213%2017.582%2C9.83%2017.582%2C9.358%20C17.582%2C8.887%2017.197%2C8.504%2016.725%2C8.504%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M14.822%2C6.6%20C14.346%2C6.6%2013.967%2C6.985%2013.967%2C7.455%20C13.967%2C7.925%2014.35%2C8.31%2014.822%2C8.31%20C15.294%2C8.31%2015.676%2C7.924%2015.676%2C7.455%20C15.676%2C6.985%2015.297%2C6.6%2014.822%2C6.6%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M18.631%2C6.6%20C18.156%2C6.6%2017.774%2C6.985%2017.774%2C7.455%20C17.774%2C7.925%2018.157%2C8.31%2018.631%2C8.31%20C19.1%2C8.31%2019.485%2C7.924%2019.485%2C7.455%20C19.484%2C6.985%2019.104%2C6.6%2018.631%2C6.6%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M10.197%2C6.785%20L7.669%2C6.785%20L7.669%2C4.258%20C7.669%2C3.606%206.656%2C3.606%206.656%2C4.258%20L6.656%2C6.785%20L4.13%2C6.785%20C3.478%2C6.785%203.478%2C7.797%204.13%2C7.797%20L6.656%2C7.797%20L6.656%2C10.324%20C6.656%2C10.974%207.669%2C10.974%207.669%2C10.324%20L7.669%2C7.797%20L10.197%2C7.797%20C10.851%2C7.797%2010.851%2C6.785%2010.197%2C6.785%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E") no-repeat;
+    background-size: contain;
+} */
+
+/* .section-solution .parking {
+    background: url("data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20width%3D%2239px%22%20height%3D%2245px%22%20viewBox%3D%220%200%2039%2045%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%0A%20%20%20%20%3C!--%20Generator%3A%20Sketch%2049.3%20(51167)%20-%20http%3A%2F%2Fwww.bohemiancoding.com%2Fsketch%20--%3E%0A%20%20%20%20%3Ctitle%3Eparking%3C%2Ftitle%3E%0A%20%20%20%20%3Cdesc%3ECreated%20with%20Sketch.%3C%2Fdesc%3E%0A%20%20%20%20%3Cdefs%3E%3C%2Fdefs%3E%0A%20%20%20%20%3Cg%20id%3D%22Page-1%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22parking%22%20fill%3D%22%23FFFFFF%22%20fill-rule%3D%22nonzero%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20id%3D%22Rectangle-path%22%20transform%3D%22translate(11.475638%2C%2010.013018)%20rotate(45.008103)%20translate(-11.475638%2C%20-10.013018)%20%22%20x%3D%229.92265328%22%20y%3D%229.51302299%22%20width%3D%223.10597024%22%20height%3D%221%22%3E%3C%2Frect%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20id%3D%22Rectangle-path%22%20x%3D%2220.386%22%20y%3D%225.308%22%20width%3D%221%22%20height%3D%222.965%22%3E%3C%2Frect%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20id%3D%22Rectangle-path%22%20transform%3D%22translate(29.806641%2C%2010.005419)%20rotate(45.000000)%20translate(-29.806641%2C%20-10.005419)%20%22%20x%3D%2229.3066454%22%20y%3D%228.46293354%22%20width%3D%221%22%20height%3D%223.08497041%22%3E%3C%2Frect%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Group%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20id%3D%22Rectangle-path%22%20x%3D%224.997%22%20y%3D%2218.562%22%20width%3D%222.966%22%20height%3D%221%22%3E%3C%2Frect%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Crect%20id%3D%22Rectangle-path%22%20x%3D%2231.051%22%20y%3D%2218.562%22%20width%3D%222.966%22%20height%3D%221%22%3E%3C%2Frect%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M38.588%2C19.422%20C38.588%2C8.945%2030.065%2C0.422%2019.588%2C0.422%20C9.111%2C0.422%200.588%2C8.945%200.588%2C19.422%20C0.588%2C25.716%203.73%2C31.584%208.876%2C35.106%20C8.746%2C35.341%208.669%2C35.599%208.669%2C35.875%20L8.669%2C42.252%20C8.669%2C43.428%209.959%2C44.315%2011.669%2C44.315%20L27.669%2C44.315%20C29.379%2C44.315%2030.669%2C43.428%2030.669%2C42.252%20L30.669%2C35.875%20C30.669%2C35.569%2030.578%2C35.285%2030.419%2C35.028%20C35.489%2C31.495%2038.588%2C25.644%2038.588%2C19.422%20Z%20M19.837%2C26.562%20C15.701%2C26.562%2012.337%2C23.198%2012.337%2C19.062%20C12.337%2C14.926%2015.701%2C11.562%2019.837%2C11.562%20C23.973%2C11.562%2027.337%2C14.926%2027.337%2C19.062%20C27.337%2C23.197%2023.973%2C26.562%2019.837%2C26.562%20Z%20M27.67%2C35.812%20C28.185%2C35.812%2028.528%2C35.949%2028.67%2C36.038%20L28.67%2C37.728%20L10.67%2C37.728%20L10.67%2C36.038%20C10.811%2C35.949%2011.155%2C35.812%2011.67%2C35.812%20L27.67%2C35.812%20Z%20M10.669%2C38.728%20L28.669%2C38.728%20L28.669%2C39.728%20L10.669%2C39.728%20L10.669%2C38.728%20Z%20M27.67%2C42.313%20L11.67%2C42.313%20C11.155%2C42.313%2010.811%2C42.176%2010.67%2C42.087%20L10.67%2C40.727%20L28.67%2C40.727%20L28.67%2C42.087%20C28.528%2C42.177%2028.185%2C42.313%2027.67%2C42.313%20Z%20M28.498%2C33.895%20C28.235%2C33.846%2027.962%2C33.812%2027.67%2C33.812%20L20.337%2C33.812%20L20.337%2C27.537%20C24.79%2C27.276%2028.337%2C23.58%2028.337%2C19.062%20C28.337%2C14.375%2024.524%2C10.562%2019.837%2C10.562%20C15.15%2C10.562%2011.337%2C14.375%2011.337%2C19.062%20C11.337%2C23.58%2014.883%2C27.276%2019.337%2C27.537%20L19.337%2C33.812%20L11.67%2C33.812%20C11.334%2C33.812%2011.021%2C33.855%2010.724%2C33.919%20C5.695%2C30.837%202.588%2C25.34%202.588%2C19.422%20C2.588%2C10.048%2010.214%2C2.422%2019.588%2C2.422%20C28.962%2C2.422%2036.588%2C10.048%2036.588%2C19.422%20C36.588%2C25.301%2033.494%2C30.809%2028.498%2C33.895%20Z%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M19.296%2C21.069%20L19.296%2C24.462%20L18.124%2C24.462%20L18.124%2C15.385%20L20.702%2C15.385%20C21.682%2C15.385%2022.443%2C15.621%2022.984%2C16.094%20C23.525%2C16.567%2023.796%2C17.242%2023.796%2C18.121%20C23.796%2C19.012%2023.48%2C19.733%2022.847%2C20.286%20C22.214%2C20.839%2021.423%2C21.099%2020.474%2C21.068%20L19.296%2C21.068%20L19.296%2C21.069%20Z%20M19.296%2C16.417%20L19.296%2C20.038%20L20.38%2C20.038%20C21.095%2C20.038%2021.638%2C19.877%2022.009%2C19.555%20C22.38%2C19.233%2022.566%2C18.771%2022.566%2C18.169%20C22.566%2C17.001%2021.875%2C16.417%2020.492%2C16.417%20L19.296%2C16.417%20Z%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E") no-repeat;
+    background-size: contain;
+} */
+
+/* .section-solution .sapsecurity {
+    background: url("data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20width%3D%2238px%22%20height%3D%2242px%22%20viewBox%3D%220%200%2038%2042%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%0A%20%20%20%20%3C!--%20Generator%3A%20Sketch%2049.3%20(51167)%20-%20http%3A%2F%2Fwww.bohemiancoding.com%2Fsketch%20--%3E%0A%20%20%20%20%3Ctitle%3Esapsecurity%3C%2Ftitle%3E%0A%20%20%20%20%3Cdesc%3ECreated%20with%20Sketch.%3C%2Fdesc%3E%0A%20%20%20%20%3Cdefs%3E%3C%2Fdefs%3E%0A%20%20%20%20%3Cg%20id%3D%22Page-1%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22sapsecurity%22%20transform%3D%22translate(-5.000000%2C%20-3.000000)%22%20fill%3D%22%23FFFFFF%22%20fill-rule%3D%22nonzero%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Group%22%20transform%3D%22translate(5.000000%2C%203.000000)%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M19%2C41.721%20C18.115%2C41.721%2017.389%2C41.533%2016.71%2C41.123%20C14.002%2C39.462%206.831%2C35.066%203.813%2C29.123%20C1.356%2C24.115%200.376%2C16.312%200.012%2C12.105%20C-0.134%2C10.068%201.035%2C8.312%202.989%2C7.617%20C4.79%2C7.014%208.367%2C5.819%2010.057%2C5.015%20C13.012%2C3.536%2014.367%2C2.497%2015.559%2C1.582%20L16.122%2C1.153%20C17.004%2C0.563%2017.956%2C0.279%2019%2C0.279%20C20.145%2C0.279%2021.133%2C0.619%2021.941%2C1.292%20L22.439%2C1.669%20C23.638%2C2.589%2024.993%2C3.627%2027.972%2C5.118%20C29.654%2C5.919%2033.222%2C7.108%2034.937%2C7.681%20C36.876%2C8.278%2038.125%2C10.154%2037.99%2C12.247%20C37.609%2C16.443%2036.616%2C24.18%2034.195%2C29.105%20C31.163%2C35.075%2024.001%2C39.462%2021.301%2C41.119%20C20.607%2C41.531%2019.879%2C41.721%2019%2C41.721%20Z%20M19%2C2.18%20C18.33%2C2.18%2017.752%2C2.35%2017.229%2C2.701%20L16.717%2C3.093%20C15.455%2C4.061%2014.026%2C5.156%2010.891%2C6.726%20C9.078%2C7.586%205.563%2C8.762%203.675%2C9.394%20C2.483%2C9.817%201.823%2C10.793%201.907%2C11.958%20C2.26%2C16.019%203.199%2C23.559%205.513%2C28.275%20C8.282%2C33.724%2015.121%2C37.921%2017.697%2C39.5%20C18.07%2C39.723%2018.463%2C39.82%2019%2C39.82%20C19.538%2C39.82%2019.934%2C39.72%2020.323%2C39.491%20C22.882%2C37.923%2029.712%2C33.732%2032.496%2C28.255%20C34.773%2C23.617%2035.728%2C16.143%2036.098%2C12.1%20C36.175%2C10.912%2035.477%2C9.834%2034.395%2C9.503%20C32.587%2C8.901%2028.946%2C7.687%2027.139%2C6.827%20C23.98%2C5.244%2022.55%2C4.148%2021.29%2C3.183%20L20.757%2C2.78%20C20.255%2C2.361%2019.707%2C2.18%2019%2C2.18%20Z%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20transform%3D%22translate(8.000000%2C%2016.000000)%22%20id%3D%22Shape%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M5.437%2C7.018%20C5.437%2C6.647%205.303%2C6.338%205.039%2C6.087%20C4.773%2C5.837%204.308%2C5.626%203.64%2C5.449%20C2.811%2C5.244%202.165%2C4.941%201.701%2C4.545%20C1.236%2C4.149%201.005%2C3.643%201.005%2C3.04%20C1.005%2C2.402%201.254%2C1.87%201.754%2C1.446%20C2.255%2C1.021%202.904%2C0.807%203.702%2C0.807%20C4.559%2C0.807%205.243%2C1.052%205.753%2C1.537%20C6.262%2C2.025%206.51%2C2.593%206.493%2C3.242%20L6.476%2C3.275%20L5.424%2C3.275%20C5.424%2C2.812%205.263%2C2.43%204.94%2C2.129%20C4.619%2C1.827%204.205%2C1.675%203.702%2C1.675%20C3.187%2C1.675%202.792%2C1.8%202.517%2C2.05%20C2.244%2C2.3%202.107%2C2.624%202.107%2C3.024%20C2.107%2C3.378%202.257%2C3.673%202.556%2C3.912%20C2.857%2C4.149%203.345%2C4.356%204.021%2C4.537%20C4.841%2C4.749%205.467%2C5.063%205.897%2C5.477%20C6.326%2C5.891%206.541%2C6.405%206.541%2C7.01%20C6.541%2C7.668%206.282%2C8.196%205.765%2C8.596%20C5.248%2C8.994%204.574%2C9.194%203.742%2C9.194%20C2.956%2C9.194%202.26%2C8.973%201.658%2C8.534%20C1.055%2C8.093%200.762%2C7.501%200.781%2C6.764%20L0.793%2C6.729%20L1.846%2C6.729%20C1.846%2C7.243%202.04%2C7.633%202.427%2C7.915%20C2.815%2C8.194%203.253%2C8.333%203.742%2C8.333%20C4.265%2C8.333%204.678%2C8.214%204.98%2C7.979%20C5.284%2C7.74%205.437%2C7.424%205.437%2C7.018%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M12.312%2C6.973%20L9.244%2C6.973%20L8.515%2C9.073%20L7.392%2C9.073%20L10.33%2C0.925%20L11.273%2C0.925%20L14.152%2C9.073%20L13.025%2C9.073%20L12.312%2C6.973%20Z%20M9.561%2C6.05%20L11.997%2C6.05%20L10.809%2C2.552%20L10.778%2C2.552%20L9.561%2C6.05%20Z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M16.451%2C5.803%20L16.451%2C9.073%20L15.348%2C9.073%20L15.348%2C0.925%20L18.465%2C0.925%20C19.334%2C0.925%2020.01%2C1.149%2020.494%2C1.596%20C20.978%2C2.044%2021.219%2C2.634%2021.219%2C3.365%20C21.219%2C4.103%2020.979%2C4.695%2020.494%2C5.138%20C20.01%2C5.583%2019.334%2C5.804%2018.465%2C5.804%20L16.451%2C5.804%20L16.451%2C5.803%20Z%20M16.451%2C4.939%20L18.467%2C4.939%20C19.021%2C4.939%2019.433%2C4.791%2019.703%2C4.496%20C19.974%2C4.197%2020.112%2C3.825%2020.112%2C3.374%20C20.112%2C2.921%2019.973%2C2.545%2019.699%2C2.242%20C19.426%2C1.94%2019.014%2C1.789%2018.467%2C1.789%20L16.451%2C1.789%20L16.451%2C4.939%20Z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E") no-repeat;
+    background-size: contain;
+} */
+
+/* .section-solution .tbox {
+    background: url("data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20width%3D%2244px%22%20height%3D%2234px%22%20viewBox%3D%220%200%2044%2034%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%0A%20%20%20%20%3C!--%20Generator%3A%20Sketch%2049.3%20(51167)%20-%20http%3A%2F%2Fwww.bohemiancoding.com%2Fsketch%20--%3E%0A%20%20%20%20%3Ctitle%3Etbox%3C%2Ftitle%3E%0A%20%20%20%20%3Cdesc%3ECreated%20with%20Sketch.%3C%2Fdesc%3E%0A%20%20%20%20%3Cdefs%3E%3C%2Fdefs%3E%0A%20%20%20%20%3Cg%20id%3D%22Page-1%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22tbox%22%20fill%3D%22%23FFFFFF%22%20fill-rule%3D%22nonzero%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M31.059%2C33.468%20L12.938%2C33.468%20C5.805%2C33.468%200%2C27.706%200%2C20.624%20C0%2C14.541%204.395%2C9.247%2010.313%2C8.081%20C12.411%2C3.477%2016.936%2C0.533%2022%2C0.533%20C27.063%2C0.533%2031.587%2C3.477%2033.686%2C8.081%20C39.604%2C9.248%2044%2C14.541%2044%2C20.624%20C44%2C27.704%2038.193%2C33.468%2031.059%2C33.468%20M22%2C2.567%20C17.581%2C2.567%2013.646%2C5.237%2011.975%2C9.37%20C11.839%2C9.703%2011.538%2C9.941%2011.182%2C9.995%20C5.967%2C10.779%202.036%2C15.348%202.036%2C20.625%20C2.036%2C26.584%206.931%2C31.436%2012.94%2C31.436%20L31.063%2C31.436%20C37.08%2C31.436%2041.969%2C26.584%2041.969%2C20.625%20C41.969%2C15.347%2038.033%2C10.777%2032.821%2C9.995%20C32.467%2C9.942%2032.166%2C9.704%2032.028%2C9.37%20C30.354%2C5.236%2026.418%2C2.567%2022%2C2.567%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Group%22%20transform%3D%22translate(14.000000%2C%2010.000000)%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M8.001%2C16.497%20C3.626%2C16.497%200.064%2C12.936%200.064%2C8.56%20C0.064%2C4.185%203.625%2C0.622%208.001%2C0.622%20C12.377%2C0.622%2015.937%2C4.184%2015.937%2C8.56%20C15.937%2C12.937%2012.376%2C16.497%208.001%2C16.497%20Z%20M6.878%2C15.405%20C7.603%2C15.522%208.38%2C15.522%209.108%2C15.409%20C9.176%2C14.704%209.331%2C13.337%209.421%2C12.758%20C9.796%2C10.439%2010.6%2C9.489%2012.491%2C9.13%20C12.902%2C9.035%2013.361%2C9.022%2013.756%2C9.022%20C13.766%2C9.022%2014.533%2C9.028%2014.917%2C9.042%20C14.928%2C8.884%2014.936%2C8.725%2014.936%2C8.563%20C14.936%2C8.042%2014.876%2C7.534%2014.768%2C7.044%20L1.231%2C7.044%20C1.122%2C7.533%201.064%2C8.041%201.064%2C8.563%20C1.064%2C8.718%201.069%2C8.874%201.079%2C9.026%20C1.567%2C9.015%202.924%2C9.02%203.508%2C9.13%20C5.416%2C9.494%206.219%2C10.443%206.575%2C12.761%20C6.661%2C13.31%206.803%2C14.647%206.878%2C15.405%20Z%20M13.758%2C10.022%20C13.404%2C10.022%2013.03%2C10.034%2012.696%2C10.108%20C11.209%2C10.391%2010.718%2C10.996%2010.411%2C12.918%20C10.338%2C13.378%2010.217%2C14.425%2010.14%2C15.162%20C12.464%2C14.405%2014.253%2C12.455%2014.781%2C10.037%20C14.442%2C10.026%2013.858%2C10.022%2013.758%2C10.022%20Z%20M1.219%2C10.024%20C1.74%2C12.444%203.527%2C14.397%205.848%2C15.157%20C5.769%2C14.386%205.655%2C13.354%205.587%2C12.916%20C5.296%2C11.02%204.788%2C10.395%203.322%2C10.112%20C2.912%2C10.034%201.821%2C10.008%201.219%2C10.024%20Z%20M1.537%2C6.044%20L14.463%2C6.044%20C13.453%2C3.46%2010.937%2C1.625%208.001%2C1.625%20C5.064%2C1.625%202.546%2C3.46%201.537%2C6.044%20Z%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M8%2C11.044%20C7.065%2C11.044%206.305%2C10.284%206.305%2C9.351%20C6.305%2C8.416%207.065%2C7.657%208%2C7.657%20C8.934%2C7.657%209.695%2C8.417%209.695%2C9.351%20C9.693%2C10.284%208.934%2C11.044%208%2C11.044%20Z%20M8%2C8.656%20C7.617%2C8.656%207.305%2C8.969%207.305%2C9.35%20C7.305%2C9.731%207.617%2C10.043%208%2C10.043%20C8.383%2C10.043%208.695%2C9.731%208.695%2C9.35%20C8.695%2C8.969%208.383%2C8.656%208%2C8.656%20Z%22%20id%3D%22Shape%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E") no-repeat;
+    background-size: contain;
+} */
+
+@media (max-width: 1023px) {
+  .section-solution {
+    padding: 0;
+  }
+
+  .section-solution .section-head p {
+    color: rgba(255, 255, 255, .6);
+  }
+
+  .section-solution .solution-bg {
+    background: url(../images/index-v3/solution/solution-mb.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/solution/solution-mb.png*/ no-repeat;
+    background-size: cover;
+    background-position: top;
+  }
+
+  .section-solution .solution-detial {
+    display: none !important;
+  }
+
+  .section-solution .section-more-wrap {
+    display: block;
+  }
+
+  .section-solution .section-more-wrap a {
+    color: #ffffff;
+    font-size: 12px;
+  }
+
+  .section-solution .section-more-wrap .pc {
+    display: none;
+  }
+
+  .section-solution .section-more-wrap .mb {
+    display: block;
+  }
+
+  .section-solution .solution-nav {
+    width: auto;
+    float: none;
+  }
+
+  .section-solution .solution-nav .solution-nav-list li {
+    width: 100%;
+    padding: 15px 0;
+    margin: 0;
+    height: auto;
+    background: none !important;
+  }
+
+  .section-solution .solution-nav .solution-nav-list li h2 {
+    font-size: 14px;
+    color: #FFFFFF;
+    line-height: 20px;
+    margin: 5px auto 0;
+    text-align: center;
+  }
+
+  .section-solution .solution-nav .solution-nav-list li i {
+    display: block;
+    width: 35px;
+    height: 35px;
+    margin: 0 auto;
+    font-size: 35px;
+    color: #fff;
+  }
+
+  .section-solution .solution-nav .solution-nav-list li a {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    display: block;
+  }
+
+  .section-solution .solution-nav .solution-nav-list li.active {
+    width: 100%;
+    padding: 15px 0;
+    margin: 0;
+  }
+
+  .section-solution .solution-nav .solution-nav-list li.hide-mb {
+    display: none;
+  }
+
+  .section-solution .solution-nav .solution-nav-list li:nth-child(odd) {
+    background: rgba(121, 121, 132, 0.3) !important;
+  }
+}
+
+/* endregion section: solution*/
+
+/* region section: service*/
+
+.service-wrapper {
+  max-width: 1210px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.service-body {
+  background: #fff;
+  border-radius: 2px;
+  border: 1px solid #ddd;
+  box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.10);
+}
+
+.service-body:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.service-item {
+  width: 25%;
+  float: left;
+  border-left: 1px solid #ddd;
+}
+
+.service-item:first-child {
+  border-left: none;
+}
+
+.service-card {
+  position: relative;
+  width: 100%;
+  height: 300px;
+}
+
+.service-card-inner {
+  display: none;
+  opacity: 1;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  padding: 50px 48px 40px 48px;
+  text-align: center;
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+}
+
+.service-item:hover .service-card-inner {
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+  opacity: 0;
+}
+
+.service-card-inner i {
+  width: 60px;
+  height: 60px;
+  display: block;
+  margin: 0 auto;
+}
+
+.service-card1 .service-card-inner i {
+  background: url('../img/service/service-icon1.png')/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/service/service-icon1.png*/ no-repeat center;
+}
+
+.service-card2 .service-card-inner i {
+  background: url('../img/service/service-icon2.png')/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/service/service-icon2.png*/ no-repeat center;
+}
+
+.service-card3 .service-card-inner i {
+  background: url('../img/service/service-icon3.png')/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/service/service-icon3.png*/ no-repeat center;
+}
+
+.service-card4 .service-card-inner i {
+  background: url('../img/service/service-icon4.png')/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/service/service-icon4.png*/ no-repeat center;
+}
+
+.service-card-inner h2 {
+  margin-top: 23px;
+  margin-bottom: 39px;
+  font-size: 18px;
+  color: #3B516A;
+  letter-spacing: 0;
+  text-align: center;
+  line-height: 22px;
+}
+
+.service-card-inner p {
+  color: #252B3A;
+  text-align: center;
+}
+
+.service-card-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: 0s .2s;
+  -webkit-transition: 0s .2s;
+  width: 100%;
+}
+
+.service-card-hover:hover {
+  transition: 0s;
+}
+
+.service-card-hover-topbg {
+  width: 100%;
+  height: 160px;
+  transition: 0.2s;
+  -webkit-transition: 0.2s;
+  opacity: 0;
+}
+
+.service-item:hover .service-card-hover-topbg {
+  transition: 0.3s;
+  -webkit-transition: 0.3s;
+  opacity: 1;
+}
+
+.service-card-hover-top {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 180px;
+  background-size: cover;
+  padding: 30px 40px;
+}
+
+.service-item:hover .service-card-inner {
+  opacity: 0;
+}
+
+.service-item:hover .service-card-hover {
+  opacity: 1;
+}
+
+.service-item .service-card1 .service-card-hover-topbg {
+  background: url('../img/service/service-bg1.jpg')/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/service/service-bg1.jpg*/ no-repeat center;
+}
+
+.service-item:hover .service-card1 .service-card-hover-topbg {
+  opacity: 1;
+}
+
+.service-item .service-card2 .service-card-hover-topbg {
+  background: url('../img/service/service-bg2.jpg')/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/service/service-bg2.jpg*/ no-repeat center;
+}
+
+.service-item:hover .service-card2 .service-card-hover-topbg {
+  opacity: 1;
+}
+
+.service-item .service-card3 .service-card-hover-topbg {
+  background: url('../img/service/service-bg3.jpg')/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/service/service-bg3.jpg*/ no-repeat center;
+}
+
+.service-item:hover .service-card3 .service-card-hover-topbg {
+  opacity: 1;
+}
+
+.service-item .service-card4 .service-card-hover-topbg {
+  background: url('../img/service/service-bg4.jpg')/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/service/service-bg4.jpg*/ no-repeat center;
+}
+
+.service-item:hover .service-card4 .service-card-hover-topbg {
+  opacity: 1;
+}
+
+.service-card-hover-top p, .service-card-hover-top h2, .service-card-hover-bottom a {
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+  opacity: 0;
+}
+
+.service-item:hover .service-card-hover-top p,
+.service-item:hover .service-card-hover-top h2,
+.service-item:hover .service-card-hover-bottom a {
+  -webkit-transition: 0.2s;
+  transition: 0.2s;
+  transition-delay: 0.1s;
+  -webkit-transition-delay: 0.1s;
+  opacity: 1;
+}
+
+.service-card-hover-top span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 50px;
+  height: 20px;
+  background: url('../images/index-v3/service/label-icon.png')/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/service/label-icon.png*/ no-repeat center;
+}
+
+.service-card-hover-top h2 {
+  font-size: 24px;
+  color: #FFFFFF;
+  letter-spacing: 0;
+  text-align: center;
+  line-height: 46px;
+}
+
+.service-card-hover-top p {
+  text-align: center;
+  margin-top: 20px;
+  color: #fff;
+}
+
+.service-card-hover-bottom a {
+  opacity: 1;
+}
+
+.service-card-hover-bottom ul {
+  padding: 34px 15px;
+}
+
+.service-card-hover-bottom li {
+  text-align: center;
+}
+
+.service-card-hover-bottom li a {
+  color: #252B3A;
+  line-height: 24px;
+}
+
+.service-card-hover-bottom li a:hover {
+  color: #F7746F;
+}
+
+.partner-head h2 {
+  font-size: 24px;
+  color: #3B516A;
+  letter-spacing: 0;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 1023px) {
+  .service-card-hover {
+    display: none;
+  }
+
+  .service-item:hover .service-card-inner {
+    opacity: 1;
+  }
+
+  .service-body {
+    border: none;
+    box-shadow: initial;
+  }
+
+  .service-card {
+    height: 170px;
+  }
+
+  .service-item {
+    width: calc(50% - 2px);
+    border: 1px solid #C9C9C9;
+    margin-top: 4px;
+  }
+
+  .service-item:first-child {
+    border-left: 1px solid #C9C9C9;
+  }
+
+  .service-item:nth-child(2n) {
+    margin-left: 4px;
+  }
+
+  .service-card-inner p {
+    display: none;
+  }
+
+  .service-card-inner h2 {
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
+
+  .service-card-inner {
+    padding: 35px;
+  }
+
+}
+
+/* endregion section: service*/
+
+/* region section: map */
+
+/* 地图图片设置*/
+.section-map {
+  background: url(../img/map/map-pc.jpg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-pc.jpg*/ no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding-bottom: 8px;
+}
+
+.section-map + .home-section {
+  padding-top: 70px;
+}
+
+.map-wrapper {
+  max-width: 1210px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-map .service-body {
+  background: none;
+  box-shadow: none;
+}
+
+@media (min-width: 1024px) {
+  .section-map .section-head {
+    padding-top: 60px;
+  }
+}
+
+/* .section-map .section-head p:hover a {
+    color: #fa6f66;
+    
+} */
+/* .section-map .section-head p:hover{
+  opacity:1;
+  
+} */
+.section-map .section-head h2 {
+  font-size: 36px;
+  color: #FFFFFF;
+  line-height: 50px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: 400;
+}
+
+.section-map .section-head p {
+  font-size: 18px;
+  color: #ffffff;
+  opacity: 0.6;
+  line-height: 22px;
+  text-align: center;
+}
+
+.map-mod img {
+  width: 100%;
+}
+
+.map-body .map-wrap {
+  position: relative;
+  margin-top: 57px;
+}
+
+.map-data {
+  display: table;
+  width: 100%;
+  padding-left: 100px;
+  padding-right: 100px;
+}
+
+.map-data ul {
+  display: table-row;
+}
+
+.map-data li {
+  display: table-cell;
+  width: 25%;
+}
+
+.map-data h2 {
+  font-size: 48px;
+  line-height: 46px;
+  color: #97FFE3;
+  text-align: center;
+  transition: .15s;
+}
+
+.map-data h2 span {
+  font-size: 24px;
+  line-height: 24px;
+}
+
+.map-data p {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 22px;
+  color: #fff;
+  text-align: center;
+}
+
+.map-data p:first-of-type {
+  display: none;
+}
+
+.map-data h2:hover {
+  color: #00ffbb;
+  transition: .2s;
+  -ms-transform: scale(1.2);
+  transform: scale(1.2);
+}
+
+.map-body .map-list {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map-list .c-map-dot-text-left {
+  font-size: 12px;
+  line-height: 20px;
+  color: #ffffff;
+  position: absolute;
+  top: 25px;
+  right: 36px;
+  white-space: nowrap;
+  z-index: 4;
+}
+
+.c-map-dot-text-bottom {
+  font-size: 12px;
+  line-height: 20px;
+  color: #ffffff;
+  position: absolute;
+  left: 50%;
+  margin-left: -25px;
+  white-space: nowrap;
+  z-index: 4;
+}
+
+.map-list .c-map-dot-text-right {
+  font-size: 12px;
+  line-height: 20px;
+  color: #ffffff;
+  position: absolute;
+  top: 25px;
+  left: 36px;
+  white-space: nowrap;
+  z-index: 6;
+}
+
+.map-body .map-explain {
+  position: absolute;
+  left: 50%;
+  margin-left: -150px;
+  bottom: 0;
+  z-index: 3;
+}
+
+.map-dot1 a,
+.map-dot2 a {
+  display: block;
+  margin: 5px;
+  width: 25px;
+  height: 44px;
+}
+
+.map-explain .map-explain-item {
+  float: left;
+  width: 150px;
+  padding-left: 40px;
+}
+
+.map-wrap .map-dot1 {
+  display: inline-block;
+  width: 35px;
+  height: 54px;
+  position: absolute;
+  top: -5px;
+  left: 0;
+  transition: all 0.3s;
+  background: url(../img/map/map-icon-2.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-icon-2.png*/ no-repeat;
+  background-position: 0 0;
+  z-index: 4;
+}
+
+.map-dot1.animate.play::after {
+  content: "";
+  display: inline-block;
+  width: 35px;
+  height: 54px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: url(../img/map/map-icon-2.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-icon-2.png*/ no-repeat;
+  background-position: -70px 33px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.5s;
+}
+
+.map-dot2.animate.play::after {
+  content: "";
+  display: inline-block;
+  width: 35px;
+  height: 54px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: url(../img/map/map-icon-2.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-icon-2.png*/ no-repeat;
+  background-position: -70px 33px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.5s;
+}
+
+.map-wrap .map-img {
+  position: absolute;
+  margin-top: 30px;
+  margin-left: 5px;
+  width: 25px;
+  height: 25px;
+}
+
+.map-wrap .map-dot2 {
+  display: inline-block;
+  width: 35px;
+  height: 54px;
+  position: absolute;
+  top: -5px;
+  left: 150px;
+  transition: all 0.3s;
+  background-image: url(../img/map/map-icon-2.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-icon-2.png?sttl=0817008*/;
+  background-position: -35px 0;
+}
+
+.map-explain-item .map-explain-txt {
+  line-height: 54px;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.section-map .map-info {
+  position: relative;
+  height: 140px;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-top: -60px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #ffffff;
+  top: 78px;
+  border-radius: 2px;
+  box-shadow: 0 30px 40px 0 rgba(0, 0, 0, 0.10);
+}
+
+.map-info .map-slide {
+  overflow: hidden;
+  width: 100%;
+}
+
+.map-slide .map-item {
+  float: left;
+  width: 12.5%;
+  height: 140px;
+  position: relative;
+}
+
+.map-slide a {
+  display: block;
+  height: 100%;
+  padding: 20px 5px 10px;
+}
+
+.map-slide .map-item:hover p {
+  color: #F66F6A;
+}
+
+.map-slide em {
+  display: block;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  background-size: cover;
+}
+
+.map-slide p {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #3B516A;
+  text-align: center;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+/* 动画 */
+
+.map-dot1.animate.play {
+  transform: scale(1.1);
+  /* background-position: -120px 0; */
+}
+
+.map-bubble.hover {
+  visibility: visible;
+  opacity: 1;
+}
+
+.map-dot1.animate.play:after {
+  content: "";
+  display: inline-block;
+  width: 35px;
+  height: 54px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: url(../img/map/map-icon-2.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-icon-2.png*/ no-repeat;
+  background-position: -70px 0;
+}
+
+.map-dot2.animate.play:after {
+  content: "";
+  display: inline-block;
+  width: 35px;
+  height: 54px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: url(../img/map/map-icon-2.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-icon-2.png*/ no-repeat;
+  background-position: -70px 0;
+}
+
+.map-dot2.animate.play {
+  transform: scale(1.1);
+  /* background-position: -168px 0; */
+}
+
+.map-dot1.animate.play + .map-img .map-bubble {
+  visibility: visible;
+  opacity: 1;
+}
+
+.map-dot2.animate.play + .map-img .map-bubble {
+  visibility: visible;
+  opacity: 1;
+}
+
+.map-dot1.play + .map-img .img1 {
+  -webkit-animation: warn 2s ease-out 0s infinite;
+  animation: warn 2s ease-out 0s infinite;
+  margin-top: 12px;
+}
+
+.map-dot1.play + .map-img .img2 {
+  -webkit-animation: warn 2s ease-out 1s infinite;
+  animation: warn 2s ease-out 1s infinite;
+  margin-top: 12px;
+}
+
+.map-dot2.play + .map-img .img1 {
+  -webkit-animation: warn 2s ease-out 0s infinite;
+  animation: warn 2s ease-out 0s infinite;
+  margin-top: 12px;
+}
+
+.map-dot2.play + .map-img .img2 {
+  -webkit-animation: warn 2s ease-out 1s infinite;
+  animation: warn 2s ease-out 1s infinite;
+  margin-top: 12px;
+}
+
+/* .map-img .img1 {
+    -webkit-animation: warn 2s ease-out 0s infinite;
+    animation: warn 2s ease-out 0s infinite;
+    margin-top:12px;
+}
+
+.map-img .img2 {
+    -webkit-animation: warn 2s ease-out 1s infinite;
+    animation: warn 2s ease-out 1s infinite;
+    margin-top:12px;
+} */
+
+@-webkit-keyframes warn {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(.1);
+    transform: scale(.1)
+  }
+  5% {
+    opacity: 1
+  }
+  to {
+    opacity: 0;
+    -webkit-transform: scale(4);
+    transform: scale(4)
+  }
+}
+
+@keyframes warn {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(.1);
+    transform: scale(.1)
+  }
+  5% {
+    opacity: 1
+  }
+  to {
+    opacity: 0;
+    -webkit-transform: scale(4);
+    transform: scale(4)
+  }
+}
+
+@-webkit-keyframes warn-2 {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(.1);
+    transform: scale(.1)
+  }
+  5% {
+    opacity: 8
+  }
+  to {
+    opacity: 0;
+    -webkit-transform: scale(10);
+    transform: scale(10)
+  }
+}
+
+@keyframes warn-2 {
+  0% {
+    opacity: 0;
+    -webkit-transform: scale(.1);
+    transform: scale(.1)
+  }
+  5% {
+    opacity: 8
+  }
+  to {
+    opacity: 0;
+    -webkit-transform: scale(10);
+    transform: scale(10)
+  }
+}
+
+.map-list img {
+  opacity: 0;
+  width: 100%;
+  position: absolute;
+}
+
+.map-list a {
+  position: relative;
+  z-index: 3;
+}
+
+/* 提示 */
+.map-bubble {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  /*background-image: url(../images/index-v3/map/map-icon-1.png?sttl=0817008);*/
+  /*background-position: -23px 0;*/
+  z-index: 2;
+  transition: all 0.6s;
+}
+
+.map-dot2 .map-bubble {
+  background-position: -23px -102px;
+}
+
+.c-map-dot-layer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  /* z-index: 10; */
+  top: 0px;
+}
+
+/* .map-bubble:hover {
+    visibility: hidden !important;
+    opacity: 0 !important;
+} */
+
+.map-dot2 .map-bubble {
+  background-position: -23px -102px;
+}
+
+.c-map-dot-layer {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  /* z-index: 10; */
+  top: 0px;
+}
+
+/* 地图小柱子图标设置 */
+.c-bubble-inner {
+  display: inline-block;
+  background: url(../img/map/map-icon-new.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-icon-new.png*/;
+  background-size: 100% 100%;
+  position: relative;
+  z-index: 4;
+}
+
+.c-bubble-inner h3,
+.c-bubble-inner p {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #FFFFFF;
+  line-height: 18px;
+  text-align: left;
+  display: block;
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+.c-bubble-inner h3 {
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+.c-bubble-inner p {
+  margin-bottom: 5px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.c-bubble-inner p:last-child {
+  margin-bottom: 20px;
+}
+
+.map-bubble.left {
+  position: absolute;
+  bottom: 24px;
+  background-position: -30px -21px;
+  z-index: 2;
+  margin-right: 58px;
+  margin-top: -33px;
+}
+
+.map-bubble.right {
+  position: absolute;
+  z-index: 4;
+  margin-top: -33px;
+  margin-left: 97px;
+}
+
+.map-bubble.right .c-bubble-inner:after {
+  content: '';
+  width: 86px;
+  height: 40px;
+  display: block;
+  position: absolute;
+  top: 28px;
+  left: -71px;
+  background: url(../img/map/map-icon-new-1.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-icon-new-1.png*/ no-repeat;
+  background-position: -119px 0px;
+
+}
+
+.map-bubble.left .c-bubble-inner:after {
+  content: '';
+  width: 86px;
+  height: 40px;
+  background-color: red;
+  display: block;
+  position: absolute;
+  top: 28px;
+  right: -71px;
+  background: url(../img/map/map-icon-new-1.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-icon-new-1.png*/ no-repeat;
+  background-position: -17px 0px;
+
+}
+
+.map-mod .map-pc {
+  display: block;
+}
+
+.map-mod .map-mc {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .section-map + .home-section {
+    padding-top: 0;
+  }
+
+  .section-map .section-head h2 {
+    font-size: 21px;
+    line-height: 30px;
+    margin-bottom: 5px;
+  }
+
+  .section-map .section-head p {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .map-data {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .map-data li {
+    position: relative;
+  }
+
+  .map-data h2 {
+    font-size: 20px;
+    line-height: 26px;
+  }
+
+  .map-data h2 span {
+    font-size: 12px;
+    line-height: 12px;
+  }
+
+  .map-data p:first-of-type {
+    display: block;
+    height: 12px;
+    overflow: hidden;
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 12px;
+    opacity: 0;
+  }
+
+  .map-data p:last-of-type {
+    position: absolute;
+    left: -10%;
+    right: -10%;
+    top: 0;
+    margin-top: 28px;
+    font-size: 12px;
+    line-height: 18px;
+    transform-origin: center top;
+    -ms-transform: scale(.8333);
+    transform: scale(.8333);
+  }
+
+  .section-map .map-info {
+    visibility: hidden;
+  }
+
+  .section-custom {
+    padding-bottom: 30px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .section-map {
+    background: url(../images/index-v3/map/map-mc.jpg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/map/map-mc.jpg*/;
+    background-size: cover;
+    padding-bottom: 0;
+  }
+
+  .map-mod .map-pc {
+    display: none;
+  }
+
+  .map-mod .map-mc {
+    display: block;
+  }
+
+  .map-wrap .map-list {
+    display: none;
+  }
+
+  .map-wrap .map-explain {
+    bottom: 20px;
+    margin-left: -100px;
+  }
+
+  .map-wrap .map-explain .map-explain-item {
+    padding-left: 25px;
+    width: 100px;
+  }
+
+  .map-wrap .map-explain .map-explain-item .map-dot1 {
+    width: 18px;
+    height: 27px;
+    background-size: cover;
+    top: -2px;
+  }
+
+  .map-wrap .map-explain .map-explain-item .map-dot2 {
+    width: 18px;
+    height: 27px;
+    background-size: cover;
+    background-position: -57px 0;
+    top: -2px;
+    left: 100px;
+  }
+
+  .map-wrap .map-explain .map-explain-item .map-explain-txt {
+    font-size: 12px;
+    line-height: 27px;
+  }
+
+  .section-map .map-wrap {
+    position: relative;
+    margin-top: 37px;
+  }
+
+  .section-map .map-info {
+    display: none;
+  }
+}
+
+/* endregion section: map */
+
+/* region section: partner*/
+
+.partner-wrapper {
+  max-width: 1210px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.partner-body {
+  overflow: hidden;
+}
+
+.partner-item {
+  float: left;
+  width: calc(100% / 5);
+  margin-top: 25px;
+  text-align: center;
+}
+
+.partner-logo {
+  display: inline-block;
+  width: 140px;
+  height: 60px;
+  margin: 0 auto;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+}
+
+.partner-item:nth-child(1) .partner-logo {
+  background-image: url(../img/partner/chinasofthover-d.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/chinasofthover-d.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(1) .partner-logo:before,
+.partner-item:nth-child(1) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/chinasofthover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/chinasofthover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(2) .partner-logo {
+  background-image: url(../img/partner/isoftstonehover-d.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/isoftstonehover-d.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(2) .partner-logo:before,
+.partner-item:nth-child(2) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/isoftstonehover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/isoftstonehover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(3) .partner-logo {
+  background-image: url(../img/partner/talkweb.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/talkweb.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(3) .partner-logo:before,
+.partner-item:nth-child(3) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/talkwebhover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/talkwebhover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(4) .partner-logo {
+  background-image: url(../img/partner/zbj.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/zbj.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(4) .partner-logo:before,
+.partner-item:nth-child(4) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/zbjhover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/zbjhover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(5) .partner-logo {
+  background-image: url(../img/partner/taike.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/taike.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(5) .partner-logo:before,
+.partner-item:nth-child(5) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/taikehover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/taikehover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(6) .partner-logo {
+  background-image: url(../img/partner/kingdee.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/kingdee.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(6) .partner-logo:before,
+.partner-item:nth-child(6) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/kingdeehover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/kingdeehover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(7) .partner-logo {
+  background-image: url(../img/partner/yongyou.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/yongyou.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(7) .partner-logo:before,
+.partner-item:nth-child(7) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/yongyouhover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/yongyouhover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(8) .partner-logo {
+  background-image: url(../img/partner/shuxi.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/shuxi.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(8) .partner-logo:before,
+.partner-item:nth-child(8) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/shuxihover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/shuxihover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(9) .partner-logo {
+  background-image: url(../img/partner/yunshi.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/yunshi.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(9) .partner-logo:before,
+.partner-item:nth-child(9) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/yunshihover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/yunshihover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(10) .partner-logo {
+  background-image: url(../img/partner/dasuo.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/dasuo.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(10) .partner-logo:before,
+.partner-item:nth-child(10) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/dasuohover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/dasuohover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(11) .partner-logo {
+  background-image: url(../img/partner/jhsofthover-d.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/jhsofthover-d.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(11) .partner-logo:before,
+.partner-item:nth-child(11) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/jhsofthover.png)/*tchinasofthover.pngpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/jhsofthover.png*/;
+}
+
+.partner-item:nth-child(12) .partner-logo {
+  background-image: url(../img/partner/nysofthover-d.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/nysofthover-d.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(12) .partner-logo:before,
+.partner-item:nth-child(12) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/nysofthover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/nysofthover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(13) .partner-logo {
+  background-image: url(../img/partner/nawanghover-d.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/nawanghover-d.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(13) .partner-logo:before,
+.partner-item:nth-child(13) .partner-logo:hover {
+  content: "";
+  background-image: url(../img/partner/nawanghover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/nawanghover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(14) .partner-logo {
+  background-image: url(../img/partner/cdvhover-d.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/cdvhover-d.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(14) .partner-logo:before,
+.partner-item:nth-child(14) .partner-logo:hover {
+  content: "";
+  background-image: url(../images/index-v3/partner/cdvhover.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/cdvhover.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(15) .partner-logo {
+  background-image: url(../images/index-v3/partner/vmallhover-d.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/vmallhover-d.png?sttl=0817008*/;
+}
+
+.partner-item:nth-child(15) .partner-logo:before,
+.partner-item:nth-child(15) .partner-logo:hover {
+  content: "";
+  background-image: url(../images/index-v3/partner/vmallhover.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/vmallhover.png?sttl=0817008*/;
+}
+
+@media (max-width: 1023px) {
+  .partner-body {
+    width: 268px;
+    margin: 0 auto;
+  }
+
+  .partner-head h2 {
+    font-size: 14px;
+    color: #34475F;
+    margin-bottom: 0;
+  }
+
+  .partner-item {
+    width: 50%;
+    height: 45px;
+    margin-top: 25px;
+    text-align: left;
+  }
+
+  .partner-item:nth-child(2n) {
+    text-align: right;
+  }
+
+  .partner-logo {
+    height: 45px;
+    width: 105px;
+  }
+
+  .partner-item .partner-logo {
+    -webkit-background-size: 105px 45px;
+    background-size: 105px 45px;
+  }
+
+  .partner-item:nth-child(1) .partner-logo {
+    background-image: url(../images/index-v3/partner/chinasoft-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/chinasoft-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(2) .partner-logo {
+    background-image: url(../images/index-v3/partner/isoftstone-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/isoftstone-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(3) .partner-logo {
+    background-image: url(../images/index-v3/partner/talkweb-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/talkweb-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(4) .partner-logo {
+    background-image: url(../images/index-v3/partner/zbj-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/zbj-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(5) .partner-logo {
+    background-image: url(../images/index-v3/partner/taike-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/taike-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(6) .partner-logo {
+    background-image: url(../images/index-v3/partner/kingdee-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/kingdee-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(7) .partner-logo {
+    background-image: url(../images/index-v3/partner/yongyou-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/yongyou-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(8) .partner-logo {
+    background-image: url(../images/index-v3/partner/shuxi-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/shuxi-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(9) .partner-logo {
+    background-image: url(../images/index-v3/partner/yunshi-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/yunshi-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(10) .partner-logo {
+    background-image: url(../images/index-v3/partner/dasuo-mb.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/dasuo-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(11) .partner-logo {
+    background-image: url(../images/index-v3/partner/jhsoft-mb.png-sttl=0817008)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/jhsoft-mb.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(12) .partner-logo {
+    background-image: url(../images/index-v3/partner/nysofthover.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/nysofthover.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(13) .partner-logo {
+    background-image: url(../images/index-v3/partner/nawanghover.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/nawanghover.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(14) .partner-logo {
+    background-image: url(../images/index-v3/partner/cdvhover.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/cdvhover.png?sttl=0817008*/;
+  }
+
+  .partner-item:nth-child(15) .partner-logo {
+    background-image: url(../images/index-v3/partner/vmallhover.png-sttl=0817008.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/partner/vmallhover.png?sttl=0817008*/;
+  }
+
+  /* .partner-wrapper .section-more-wrap {
+      display: none;
+  } */
+}
+
+/* endregion section: partner*/
+
+/* region section: news*/
+.section-news {
+  background: url(../img/news/news-bg.jpg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/news-bg.jpg*/;
+  background-position: center top;
+  background-size: cover;
+}
+
+.news-wrapper {
+  max-width: 1210px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.news-body:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.news-tag {
+  display: inline-block;
+  padding-left: 10px;
+  padding-right: 10px;
+  background: #E8EBFF;
+  border-radius: 2px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #666A75;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.news-tag-title {
+  background: rgba(246, 111, 106, .1);
+  color: #F66F6A;
+}
+
+.news-tag:hover {
+  background: #AFB7EC;
+  color: #fff;
+}
+
+.news-tag-title:hover {
+  background: #F66F6A;
+  color: #fff;
+}
+
+.news-tag-group {
+  font-size: 0;
+}
+
+.news-tag-group .news-tag + .news-tag {
+  margin-left: 10px;
+}
+
+.news-main {
+  float: left;
+  width: 510px;
+  height: 520px;
+  padding-right: 15px;
+}
+
+.news-main-card {
+  background: white;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.10);
+  transition: box-shadow .2s;
+}
+
+.news-main-top {
+  display: block;
+  position: relative;
+  height: 277px;
+  padding-top: 10px;
+  overflow: hidden;
+  background-image: url(../img/watch/video.jpg)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/video.jpg?sttl=0817008*/;
+  background-position: center;
+  background-size: 100% auto;
+  white-space: nowrap;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.news-play-btn {
+  display: inline-block;
+  width: 60px;
+  height: 45px;
+  background-image: url(../img/watch/video-play-btn.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/video-play-btn.png?sttl=0817008*/;
+  background-position: center;
+  background-size: cover;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.news-play-btn:before {
+  content: "";
+  font-size: 0;
+  background-image: url(../img/watch/video-play-btn-hover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/video-play-btn-hover.png?sttl=0817008*/;
+}
+
+.news-main-top .news-play-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+}
+
+.news-main-top:hover {
+  background-size: 110% auto;
+}
+
+.news-main-top:hover .news-play-btn {
+  background-image: url(../img/watch/video-play-btn-hover.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/video-play-btn-hover.png?sttl=0817008*/;
+}
+
+.news-video-barrage-wrapper {
+  overflow: hidden;
+  width: calc((1350px + 50px) * 3);
+  margin-left: 100%;
+  margin-top: -5px;
+  -webkit-animation: barrageMove 25s linear infinite;
+  animation: barrageMove 32s linear infinite;
+}
+
+.news-video-barrage {
+  float: left;
+  width: 1350px;
+  height: 39px;
+  margin: 0 25px;
+  background-image: url(../img/watch/news-barrage.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/news-barrage.png?sttl=0817008*/;
+}
+
+/* 第一张弹幕延时显示 */
+.news-video-barrage:first-child {
+  opacity: 0;
+  -webkit-animation: delayShow 0s 24s forwards;
+  animation: delayShow 0s 24s forwards;
+}
+
+@-webkit-keyframes barrageMove {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(-20px, 0, 0);
+  }
+}
+
+@keyframes barrageMove {
+  0% {
+    -ms-transform: translate3d(-33.33333333%, 0, 0);
+    transform: translate3d(-33.33333333%, 0, 0);
+  }
+
+  100% {
+    -ms-transform: translate3d(-66.66666666%, 0, 0);
+    transform: translate3d(-66.66666666%, 0, 0);
+  }
+}
+
+@-webkit-keyframes delayShow {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes delayShow {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.news-main-bottom {
+  padding: 26px 30px 14px;
+}
+
+.icon-time, .icon-people {
+  display: inline-block;
+  vertical-align: middle;
+  width: 20px;
+  height: 20px;
+  background-position: center;
+  background-size: cover;
+}
+
+.icon-time {
+  background-image: url(../img/news/icon-time.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/icon-time.png?sttl=0817008*/;
+}
+
+.icon-people {
+  background-image: url(../img/news/icon-people.png)/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/icon-people.png?sttl=0817008*/;
+}
+
+.news-main-bottom h1 {
+  font-size: 24px;
+  line-height: 30px;
+  color: #252b3a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+}
+
+.news-main-bottom h1 em {
+  font-style: normal;
+  color: #F66F6A;
+}
+
+.news-main-bottom h2 {
+  margin-top: 11px;
+  font-size: 0;
+}
+
+.news-main-bottom h2 span {
+  vertical-align: middle;
+  font-size: 14px;
+  line-height: 20px;
+  color: #252b3a;
+
+}
+
+.news-main-bottom i {
+  margin-right: 10px;
+}
+
+.news-main-bottom p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  height: 66px;
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.news-main-bottom .news-tag-group {
+  margin-top: 10px;
+}
+
+.news-main-card:hover {
+  box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.10);
+}
+
+.news-sub {
+  float: left;
+  padding-left: 15px;
+  width: calc(100% - 510px);
+}
+
+.news-list-v li {
+  height: 130px;
+  padding: 15px 30px;
+  background-image: none;
+  background-position: right bottom;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.news-list-v h1 {
+  font-size: 18px;
+  line-height: 22px;
+  color: #252b3a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.news-list-v p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  height: 44px;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 22px;
+  color: #666A74;
+}
+
+.news-list-v .news-tag-group {
+  margin-top: 10px;
+}
+
+.news-list-v .news-tag {
+  -webkit-transition: .2s;
+  transition: .2s;
+}
+
+.news-list-v li:hover {
+  background-color: white;
+  background-image: url("../images/index-v3/news/news-item-bg.png")/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/news-item-bg.png*/;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.10);
+}
+
+.news-list-v li:hover h1 {
+  color: #f66f6a;
+}
+
+@media (max-width: 1023px) {
+  .section-news {
+    background-image: linear-gradient(0deg, #FFFFFF 0%, #F1F3FF 100%);
+  }
+
+  .news-main {
+    width: 100%;
+    height: auto;
+    padding-right: 0;
+  }
+
+  .news-main-card {
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+    box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+  }
+
+  .news-main-top {
+    height: 195px;
+    background-image: url("../images/index-v3/news/video-mb.jpg")/*tpa=https://img.huaweicloud.com/static/v2_resources/images/index-v3/news/video-mb.jpg*/;
+  }
+
+  .news-play-btn {
+    width: 40px;
+    height: 30px;
+  }
+
+  .news-main-bottom {
+    padding: 15px;
+  }
+
+  .news-main-bottom h1 {
+    font-size: 16px;
+    line-height: 20px;
+    white-space: normal;
+  }
+
+  .news-main-bottom h2 i {
+    margin-right: 7px;
+  }
+
+  .news-main-bottom h2 span {
+    font-size: 12px;
+    line-height: 18px;
+    color: #666A75;
+  }
+
+  .news-main-bottom h2 + h2 {
+    margin-top: 6px;
+  }
+
+  .news-main-bottom p {
+    display: none;
+  }
+
+  .news-sub {
+    width: 100%;
+    padding-left: 0;
+    margin-top: 5px;
+  }
+
+  .news-list-v li {
+    height: auto;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .news-list-v li {
+    height: auto;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-bottom: solid 1px #ddd;
+  }
+
+  .news-list-v h1 {
+    font-size: 16px;
+    line-height: 24px;
+    white-space: normal;
+  }
+
+  .news-list-v p {
+    display: none;
+  }
+
+}
+
+/* endregion section: news*/
